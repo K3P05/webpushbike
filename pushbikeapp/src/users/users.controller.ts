@@ -3,35 +3,27 @@ import {
   Controller,
   Get,
   Post,
+  Body,
+  Param,
   Put,
   Delete,
-  Param,
-  Body,
-  NotFoundException,
-  BadRequestException,
 } from '@nestjs/common';
-import { UsersService } from './users.service';
+import { UserService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 
-@Controller('users')
-export class UsersController {
-  constructor(private readonly service: UsersService) {}
+@Controller('user')
+export class UserController {
+  constructor(private readonly service: UserService) {}
 
   @Get()
   findAll() {
     return this.service.findAll();
   }
 
-  @Get(':id_pendaftaran')
-  findOne(@Param('id_pendaftaran') id_pendaftaran: number) {
-    const user = this.service.findOne(+id_pendaftaran);
-    if (!user) {
-      throw new NotFoundException(
-        `User dengan nomor id_pendaftaran ${id_pendaftaran} tidak ditemukan`,
-      );
-    }
-    return user;
+  @Get(':id')
+  findOne(@Param('id') id: string) {
+    return this.service.findOne(+id);
   }
 
   @Post()
@@ -39,35 +31,15 @@ export class UsersController {
     return this.service.create(dto);
   }
 
-  @Put(':id_pendaftaran')
-  update(
-    @Param('id_pendaftaran') id_pendaftaran: number,
-    @Body() dto: UpdateUserDto,
-  ) {
-    try {
-      const updated = this.service.update(+id_pendaftaran, dto);
-      if (!updated) {
-        throw new NotFoundException(
-          `User dengan nomor id_pendaftaran ${id_pendaftaran} tidak ditemukan`,
-        );
-      }
-      return updated;
-    } catch (error) {
-      if (error instanceof Error) {
-        throw new BadRequestException(error.message);
-      }
-      throw new BadRequestException('Terjadi kesalahan tak dikenal');
-    }
+  @Put(':id')
+  update(@Param('id') id: string, @Body() dto: UpdateUserDto) {
+    return this.service.update(+id, dto);
   }
 
-  @Delete(':id_pendaftaran')
-  remove(@Param('id_pendaftaran') id_pendaftaran: number) {
-    const deleted = this.service.remove(+id_pendaftaran);
-    if (!deleted) {
-      throw new NotFoundException(
-        `User dengan nomor id_pendaftaran ${id_pendaftaran} tidak ditemukan`,
-      );
-    }
-    return deleted;
+  @Delete(':id')
+  remove(@Param('id') id: string) {
+    return this.service.remove(+id);
   }
 }
+
+

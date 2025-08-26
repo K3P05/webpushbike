@@ -1,15 +1,26 @@
 /* eslint-disable prettier/prettier */
-export class User {
-  constructor(
-    public id_pendaftaran: number,
-    public nama: string,
-    public plat_number: string,
-    public community: string,
-    public point1 : number,
-    public point2 : number,
-  ) {}
+import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
 
-  getDisplayName(): string {
-    return `${this.nama}(${this.id_pendaftaran})`;
-  }
+@Entity()
+export class User {
+  @PrimaryGeneratedColumn()
+  id_pendaftaran: number;
+
+  @Column({ unique: true })
+  nama: string;
+
+  @Column()
+  plat_number: string;
+
+  @Column()
+  community: string;
+
+  @Column()
+  point1: number;
+
+  @Column()
+  point2: number;
+
+  @Column()
+  email: string;
 }

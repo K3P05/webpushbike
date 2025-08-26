@@ -1,0 +1,52 @@
+services:
+  db:  # Service untuk MySQL
+    image: mysql:8.0
+    container_name: pushbikeweb-db
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+      MYSQL_DATABASE: ${DB_DATABASE}
+      MYSQL_USER: ${DB_USERNAME}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: pushbikeweb-phpmyadmin
+    restart: always
+    ports:
+      - "8080:80"
+    environment:
+      PMA_HOST: db
+      PMA_USER: ${DB_USERNAME}
+      PMA_PASSWORD: ${DB_PASSWORD}
+    depends_on:
+      - db
+
+  be-pushbikeweb:
+    build:
+      context: ../../pushbikeapp
+      dockerfile: ../misc/docker/Dockerfile.dev
+    container_name: pushbikeweb-api
+    restart: always
+    env_file:
+      - ../../.env
+    depends_on:
+      - db
+    ports:
+      - "3000:3000"
+    volumes:
+      - ../../:/app
+      - /app/node_modules
+    environment:
+      DB_HOST: db
+      DB_PORT: 3306
+      DB_USERNAME: ${DB_USERNAME}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_DATABASE: ${DB_DATABASE}
+
+volumes:
+  mysql_data:

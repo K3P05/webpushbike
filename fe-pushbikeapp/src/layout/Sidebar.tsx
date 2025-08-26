@@ -2,7 +2,7 @@ import { NavLink } from "react-router-dom";
 import { BookUser } from "lucide-react";
 
 const dataMaster = [
-  { label: "Batch 1", icon: BookUser, path: "/users" },
+  { label: "Batch 1", icon: BookUser, path: "/result" },
 ];
 
 function renderMenu(menu: typeof dataMaster) {

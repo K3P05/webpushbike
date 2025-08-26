@@ -1,15 +1,36 @@
+/* eslint-disable prettier/prettier */
 import { Test, TestingModule } from '@nestjs/testing';
-import { UsersService } from './users.service';
+import { UserService } from './users.service';
+import { getRepositoryToken } from '@nestjs/typeorm';
+import { User } from './entities/user.entity';
+import { EmailService } from '../email/email.service';
 
-describe('UsersService', () => {
-  let service: UsersService;
+describe('UserService', () => {
+  let service: UserService;
+
+  const mockRepo = {
+    find: jest.fn(),
+    findOneBy: jest.fn(),
+    create: jest.fn(),
+    save: jest.fn(),
+    merge: jest.fn(),
+    delete: jest.fn(),
+  };
+
+  const mockEmailService = {
+    sendRegistrationEmail: jest.fn(),
+  };
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      providers: [UsersService],
+      providers: [
+        UserService,
+        { provide: getRepositoryToken(User), useValue: mockRepo },
+        { provide: EmailService, useValue: mockEmailService },
+      ],
     }).compile();
 
-    service = module.get<UsersService>(UsersService);
+    service = module.get<UserService>(UserService);
   });
 
   it('should be defined', () => {

@@ -1,60 +1,62 @@
 /* eslint-disable prettier/prettier */
-import { Injectable } from '@nestjs/common';
+/* eslint-disable @typescript-eslint/no-unsafe-return */
+/* eslint-disable prettier/prettier */
+/* eslint-disable @typescript-eslint/no-unsafe-call */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+/* eslint-disable prettier/prettier */
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 import { User } from './entities/user.entity';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { EmailService } from '../email/email.service';
 
 @Injectable()
-export class UsersService {
-  private data: User[] = [];
-  private counter = 1; // auto increment ID pendaftaran
+export class UserService {
+  constructor(
+    @InjectRepository(User)
+    private readonly repo: Repository<User>,
+    private readonly emailService : EmailService,
+  ) {}
 
-  create(dto: CreateUserDto): User {
-    const newUser = new User(
-      dto.id_pendaftaran ?? this.counter++, // auto-generate jika tidak dikirim
-      dto.nama,
-      dto.plat_number,
-      dto.community,
-      dto.point1 ?? 0,
-      dto.point2 ?? 0,
-    );
-    this.data.push(newUser);
-    return newUser;
+  findAll(): Promise<User[]> {
+    return this.repo.find();
   }
 
-  findAll(): User[] {
-    return this.data;
+  async findOne(id: number): Promise<User> {
+    const data = await this.repo.findOneBy({ id_pendaftaran : id });
+    if (!data) {
+      throw new NotFoundException(`User dengan ID ${id} tidak ditemukan`);
+    }
+    return data;
   }
 
-  findOne(id_pendaftaran: number): User | undefined {
-    return this.data.find((m) => m.id_pendaftaran === id_pendaftaran);
+  async create(dto: CreateUserDto): Promise<User> {
+    const user = this.repo.create(dto);
+    const saved = await this.repo.save(user);
+
+    // Kirim email (simulasi)
+    // eslint-disable-next-line @typescript-eslint/no-floating-promises
+    this.emailService.sendRegistrationEmail(saved.email, saved.nama); // tanpa await
+
+    return saved;
+
   }
 
-  update(id_pendaftaran: number, dto: UpdateUserDto): User | null {
-    const index = this.data.findIndex((m) => m.id_pendaftaran === id_pendaftaran);
-    if (index === -1) return null;
+  async update(id: number, dto: UpdateUserDto): Promise<User> {
+    const existing = await this.repo.findOneBy({ id_pendaftaran :id });
+    if (!existing) throw new NotFoundException('User tidak ditemukan');
 
-    const user = this.data[index];
-
-    // update hanya field yang dikirim
-    this.data[index] = new User(
-      dto.id_pendaftaran ?? user.id_pendaftaran,
-      dto.nama ?? user.nama,
-      dto.plat_number ?? user.plat_number,
-      dto.community ?? user.community,
-      dto.point1 ?? user.point1,
-      dto.point2 ?? user.point2,
-    );
-
-    return this.data[index];
+    const updated = this.repo.merge(existing, dto);
+    return this.repo.save(updated);
   }
 
-  remove(id_pendaftaran: number): User | null {
-    const index = this.data.findIndex((m) => m.id_pendaftaran === id_pendaftaran);
-    if (index === -1) return null;
-
-    const deleted = this.data[index];
-    this.data.splice(index, 1);
-    return deleted;
+  async remove(id: number): Promise<void> {
+    const result = await this.repo.delete(id);
+    if (result.affected === 0) {
+      throw new NotFoundException('User tidak ditemukan');
+    }
   }
 }
+

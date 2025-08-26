@@ -1,10 +1,14 @@
 /* eslint-disable prettier/prettier */
 import { Module } from '@nestjs/common';
-import { UsersService } from './users.service';
-import { UsersController } from './users.controller';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { UserService } from './users.service';
+import { UserController } from './users.controller';
+import { User } from './entities/user.entity';
+import { EmailModule } from '../email/email.module';
 
 @Module({
-  controllers: [UsersController],
-  providers: [UsersService],
+  imports:[TypeOrmModule.forFeature([User]), EmailModule],
+  controllers: [UserController],
+  providers: [UserService],
 })
 export class UsersModule {}

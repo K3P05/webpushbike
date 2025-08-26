@@ -1,114 +1,46 @@
-// src/components/pages/LiveResult/ResultList.tsx
-import { useEffect, useState, useMemo } from "react";
-import { getUsers } from "@/services/api"; // ganti sesuai api kamu
-import type { UserType } from "@/types/users";
+import { useNavigate } from "react-router-dom";
 
 export default function ResultList() {
-  const [data, setData] = useState<UserType[]>([]);
-  const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 10;
+  const navigate = useNavigate();
 
-  useEffect(() => {
-    getUsers()
-      .then((res) => setData(res.data as UserType[]))
-      .catch(() => alert("Gagal mengambil data peserta"));
-  }, []);
-
-  // Hitung ranking & kategori
-  const processedData = useMemo(() => {
-    // 1. Hitung total point
-    const withTotal = data.map((u, idx) => ({
-      ...u,
-      gate1: idx + 1,
-      gate2: ((idx + 5) % data.length) + 1, // 6-10, lalu 1-5 (kalau 10 peserta)
-      total: u.point1 + u.point2,
-    }));
-
-    // 2. Urutkan berdasarkan total point (kecil = ranking lebih tinggi)
-    const sorted = [...withTotal].sort((a, b) => a.total - b.total);
-
-    // 3. Tambahkan ranking & kategori
-    return sorted.map((u, idx) => {
-      let category = "";
-      if (idx + 1 <= 3) category = "Final Pro";
-      else if (idx + 1 <= 6) category = "Semi Final";
-      else category = "Rep";
-
-      return {
-        ...u,
-        rank: idx + 1,
-        category,
-      };
-    });
-  }, [data]);
-
-  const totalPages = Math.ceil(processedData.length / itemsPerPage);
-  const pageData = processedData.slice(
-    (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage
-  );
+  // Dummy lomba (nanti ganti fetch API)
+  const lombaList = [
+    { id: 1, name: "Push Bike Cup 2024", date: "20 Agustus 2024" },
+    { id: 2, name: "Push Bike Championship 2024", date: "15 September 2024" },
+    { id: 3, name: "Push Bike Fun Race 2025", date: "2 Januari 2025" },
+  ];
 
   return (
-    <div className="w-full">
-      <h2 className="text-xl font-bold mb-4">🏁 Live Race Result</h2>
-      <div className="overflow-x-auto rounded-lg shadow border">
-        <table className="min-w-full text-sm text-left">
-          <thead className="bg-gray-100 text-gray-700 uppercase">
-            <tr>
-              <th className="px-4 py-3 border">Gate Start Moto 1</th>
-              <th className="px-4 py-3 border">Gate Start Moto 2</th>
-              <th className="px-4 py-3 border">Nama Peserta</th>
-              <th className="px-4 py-3 border">No Plat</th>
-              <th className="px-4 py-3 border">Asal Komunitas</th>
-              <th className="px-4 py-3 border">Point Moto 1</th>
-              <th className="px-4 py-3 border">Point Moto 2</th>
-              <th className="px-4 py-3 border">Total Point</th>
-              <th className="px-4 py-3 border">Rank</th>
-              <th className="px-4 py-3 border">Class Category</th>
-            </tr>
-          </thead>
-          <tbody className="text-gray-800">
-            {pageData.map((u) => (
-              <tr key={u.id_pendaftaran} className="hover:bg-gray-50">
-                <td className="px-4 py-2 border">{u.gate1}</td>
-                <td className="px-4 py-2 border">{u.gate2}</td>
-                <td className="px-4 py-2 border">{u.nama}</td>
-                <td className="px-4 py-2 border">{u.plat_number}</td>
-                <td className="px-4 py-2 border">{u.community}</td>
-                <td className="px-4 py-2 border text-center">{u.point1}</td>
-                <td className="px-4 py-2 border text-center">{u.point2}</td>
-                <td className="px-4 py-2 border text-center">{u.total}</td>
-                <td className="px-4 py-2 border text-center font-bold">
-                  {u.rank}
-                </td>
-                <td className="px-4 py-2 border">{u.category}</td>
-              </tr>
-            ))}
-            {pageData.length === 0 && (
-              <tr>
-                <td colSpan={10} className="text-center py-4 text-gray-500">
-                  Tidak ada data peserta.
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
-      </div>
+    <div className="p-6 max-w-5xl mx-auto">
+      <h1 className="text-3xl font-bold text-indigo-600 mb-6 text-center">
+        Pilih Lomba untuk Melihat Hasil 🚴
+      </h1>
 
-      {/* Pagination */}
-      <div className="flex justify-end items-center gap-2 mt-4">
-        {Array.from({ length: totalPages }).map((_, i) => (
-          <button
-            key={i}
-            onClick={() => setCurrentPage(i + 1)}
-            className={`w-8 h-8 rounded ${
-              currentPage === i + 1
-                ? "bg-indigo-600 text-white"
-                : "bg-white text-gray-800 border"
-            }`}
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+        {lombaList.map((lomba) => (
+          <div
+            key={lomba.id}
+            className="bg-white shadow-lg rounded-xl p-6 flex flex-col justify-between hover:shadow-xl transition"
           >
-            {i + 1}
-          </button>
+            <div>
+              <h2 className="text-xl font-semibold text-gray-800">{lomba.name}</h2>
+              <p className="text-gray-500 text-sm">{lomba.date}</p>
+            </div>
+            <div className="flex gap-3 mt-4">
+              <button
+                onClick={() => navigate(`/live/${lomba.id}/girl`)}
+                className="flex-1 bg-pink-500 hover:bg-pink-600 text-white px-4 py-2 rounded-lg shadow"
+              >
+                Girl
+              </button>
+              <button
+                onClick={() => navigate(`/live/${lomba.id}/boy`)}
+                className="flex-1 bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg shadow"
+              >
+                Boy
+              </button>
+            </div>
+          </div>
         ))}
       </div>
     </div>

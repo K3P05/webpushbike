@@ -1,5 +1,5 @@
 /* eslint-disable prettier/prettier */
-import { IsString, IsInt, IsOptional } from 'class-validator';
+import { IsString, IsInt, IsOptional, IsEmail } from 'class-validator';
 
 export class CreateUserDto {
   @IsOptional()
@@ -22,4 +22,8 @@ export class CreateUserDto {
   @IsOptional()
   @IsInt({ message: 'Point2 diisi admin' })
   point2?: number;
+
+    @IsOptional()
+  @IsEmail({},{message:'harus berupa email'})
+  email: string;
 }
