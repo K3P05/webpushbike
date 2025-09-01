@@ -1,27 +1,18 @@
- 
-import type { UserType } from '@/types/users';
-import axios from 'axios';
+import axios from "axios";
 
-export const api = axios.create({
-  baseURL: import.meta.env.VITE_BE_PUSHBIKEWEB_URL,
+const api = axios.create({
+  baseURL: import.meta.env.VITE_BE_PUSHBIKEWEB_URL || "http://localhost:3000",
   headers: {
-    'Content-Type': 'application/json',
+    "Content-Type": "application/json",
   },
 });
 
-export const getUsers = () => api.get<UserType[]>('/user');
+api.interceptors.response.use(
+  (res) => res,
+  (err) => {
+    console.error("API Error:", err.response?.data || err.message);
+    return Promise.reject(err);
+  }
+);
 
-export const getUserById = (id_pendaftaran: number) =>
-  api.get<UserType>(`/user/${id_pendaftaran}`);
-
-export const createUser = (data: UserType) =>
-  api.post('/user', data);
-
-export const updateUser = (id_pendaftaran: number, data: UserType) =>
-  api.put(`/user/${id_pendaftaran}`, data);
-
-export const deleteUser = (id_pendaftaran: number) =>
-  api.delete(`/user/${id_pendaftaran}`);
-
-console.log("API URL from env:", import.meta.env.VITE_BE_PUSHBIKEWEB_URL);
-
+export default api;

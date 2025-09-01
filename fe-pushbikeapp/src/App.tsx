@@ -1,16 +1,22 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import MainLayout from './layout/MainLayout';
-import Dashboard from './pages/Dashboard';
-import Registrasi from './pages/User/Registrasi/FormRegistrasi';
+import Dashboard from './pages/Dashboard/Dashboard';
+import Registrasi from './pages/Registrasi';
 import TentangKami from './pages/TentangKami';
 import Kontak from './pages/Kontak'
 import LoginAdmin from './pages/Login/LoginAdmin';
-import AdminDashboard from './pages/AdminDashboard';
-import ResultList from './pages/LiveResult/ResultList';
-import ResultLayout from '@/pages/LiveResult';
-import LiveResult from './pages/LiveResult/LiveResult';
-import UserForm from '@/pages/LiveResult/ResultForm';
+import AdminDashboard from './pages/Dashboard/AdminDashboard';
+import ResultList from './pages/HasilLomba';
+import ResultLayout from '@/pages/Hasil';
+import LiveResult from './pages/Hasil/LiveResult';
+import UserForm from '@/pages/Hasil/ResultForm';
 import TambahLomba from './pages/Lomba/TambahLomba'; 
+import DaftarPeserta from './pages/Peserta/DaftarPeserta';
+import DaftarLomba from './pages/Lomba/DaftarLomba';
+import KelolaLomba from './pages/Lomba/KelolaLomba';
+import Statistik from './pages/Statistik';
+import DataOlahan from './pages/Peserta/DataOlahan';
+import KelolaPesertaLomba from './pages/Peserta/KelolaPeserta';
 
 function App() {
   return (
@@ -30,6 +36,18 @@ function App() {
 
           {/* Nested route di bawah dashboard */}
           <Route path="/admindashboard/tambahLomba" element={<TambahLomba />} />
+
+          <Route path="/admindashboard/daftarpeserta" element={<DaftarPeserta />} />
+
+          <Route path="/admindashboard/daftarlomba" element={<DaftarLomba />} />
+
+          <Route path="/admindashboard/kelolalomba" element={<KelolaLomba />} />
+
+          <Route path="/admindashboard/kelolapeserta/:id" element={<KelolaPesertaLomba />} />
+
+          <Route path="/admindashboard/dataolahan" element={<DataOlahan />} />
+
+          <Route path="/admindashboard/statistik" element={<Statistik />} />
 
           {/* Nested route untuk Result */}
           <Route path="/result" element={<ResultLayout />}>
