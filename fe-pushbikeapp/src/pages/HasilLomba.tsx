@@ -1,13 +1,36 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import api from "@/services/api";
+
+type Kategori = "boy" | "girl";
+
+type LombaType = {
+  id: number;
+  nama: string;
+  tanggal: string;
+  deskripsi?: string;
+  jumlahPeserta: number;
+  biaya: number;
+  kategori: Kategori;
+};
 
 export default function ResultList() {
   const navigate = useNavigate();
+  const [lombaList, setLombaList] = useState<LombaType[]>([]);
 
-  const lombaList = [
-    { id: 1, name: "Push Bike Cup 2024", date: "20 Agustus 2024" },
-    { id: 2, name: "Push Bike Championship 2024", date: "15 September 2024" },
-    { id: 3, name: "Push Bike Fun Race 2025", date: "2 Januari 2025" },
-  ];
+  const fetchLomba = async () => {
+    try {
+      const res = await api.get<LombaType[]>("/lomba");
+      setLombaList(res.data || []);
+    } catch (err) {
+      console.error("Gagal fetch lomba:", err);
+    }
+  };
+
+  useEffect(() => {
+    fetchLomba();
+  }, []);
 
   return (
     <div className="p-6 max-w-5xl mx-auto bg-[#222831] min-h-screen font-poppins">
@@ -23,24 +46,33 @@ export default function ResultList() {
           >
             <div>
               <h2 className="text-xl font-semibold text-[#EEEEEE]">
-                {lomba.name}
+                {lomba.nama}
               </h2>
-              <p className="text-gray-300 text-sm">{lomba.date}</p>
+              <p className="text-gray-300 text-sm">
+                {new Date(lomba.tanggal).toLocaleDateString()}
+              </p>
+              {lomba.kategori && (
+                <p className="mt-1 font-semibold">
+                  Kategori:{" "}
+                  <span
+                    className={
+                      lomba.kategori === "boy"
+                        ? "text-blue-400"
+                        : "text-pink-400"
+                    }
+                  >
+                    {lomba.kategori}
+                  </span>
+                </p>
+              )}
             </div>
-            <div className="flex gap-3 mt-4">
-              <button
-                onClick={() => navigate(`/live/${lomba.id}/girl`)}
-                className="flex-1 bg-[#EC4899] hover:bg-[#BE185D] text-[#EEEEEE] px-4 py-2 rounded-lg shadow transition"
-              >
-                Girl
-              </button>
-              <button
-                onClick={() => navigate(`/live/${lomba.id}/boy`)}
-                className="flex-1 bg-[#00ADB5] hover:bg-[#019ca4] text-[#EEEEEE] px-4 py-2 rounded-lg shadow transition"
-              >
-                Boy
-              </button>
-            </div>
+
+            <button
+              onClick={() => navigate(`/livehasil/${lomba.id}`)}
+              className="mt-4 w-full bg-[#00ADB5] hover:bg-[#019ca4] text-[#EEEEEE] font-semibold px-4 py-2 rounded-lg shadow transition"
+            >
+              Lihat Hasil
+            </button>
           </div>
         ))}
       </div>

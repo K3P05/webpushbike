@@ -44,14 +44,6 @@ export default function Header() {
               </li>
               <li>
                 <Link
-                  to="/tentangkami"
-                  className="hover:text-[#00ADB5] transition"
-                >
-                  Tentang Kami
-                </Link>
-              </li>
-              <li>
-                <Link
                   to="/kontak"
                   className="hover:text-[#00ADB5] transition"
                 >
@@ -101,15 +93,6 @@ export default function Header() {
                 className="hover:text-[#00ADB5] transition"
               >
                 Hasil Live
-              </Link>
-            </li>
-            <li>
-              <Link
-                to="/tentangkami"
-                onClick={toggleMenu}
-                className="hover:text-[#00ADB5] transition"
-              >
-                Tentang Kami
               </Link>
             </li>
             <li>

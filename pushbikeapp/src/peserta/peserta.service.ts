@@ -1,10 +1,13 @@
 /* eslint-disable prettier/prettier */
 import { Injectable, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, In} from 'typeorm';
 import { Peserta } from './entities/peserta.entity';
 import { CreatePesertaDto } from './dto/create-peserta.dto';
 import { Lomba } from '../lomba/entities/lomba.entity';
+import { UpdateBatchDto } from './dto/update-peserta.dto';
+import { PointSesi } from './entities/point_sesi.entity';
+import { UpdatePointSesiDto } from './dto/update-point-sesi.dto';
 
 @Injectable()
 export class PesertaService {
@@ -13,6 +16,8 @@ export class PesertaService {
     private pesertaRepo: Repository<Peserta>,
     @InjectRepository(Lomba)
     private lombaRepo: Repository<Lomba>,
+    @InjectRepository(PointSesi)
+    private pointSesiRepo: Repository<PointSesi>,
   ) {}
 
   async create(lombaId: number, dto: CreatePesertaDto) {
@@ -38,18 +43,69 @@ export class PesertaService {
   }
 
   async findAllByLomba(lombaId: number) {
-    const peserta = await this.pesertaRepo.find({
-      where: { lomba: { id: lombaId } },
-      relations: ['lomba'],
-    });
+  const peserta = await this.pesertaRepo.find({
+    where: { lomba: { id: lombaId } },
+    relations: ['lomba', 'pointSesi'],
+  });
 
-    return peserta.map((p) => ({
-      id_pendaftaran: p.id_pendaftaran,
-      nama: p.nama,
-      kategori: p.kategori,
-      platNumber: p.plat_number,
-      community: p.community,
-      id_lomba: p.lomba.id,
-    }));
+  return peserta.map((p) => ({
+    id_pendaftaran: p.id_pendaftaran,
+    nama: p.nama,
+    kategori: p.kategori,
+    platNumber: p.plat_number,  // sesuaikan jika nama kolom di DB berbeda
+    community: p.community,
+    id_lomba: p.lomba.id,
+    point1: p.point1,   // tambah point1
+    point2: p.point2,   // tambah point2
+    batch: p.batch,
+    pointSesi: p.pointSesi,
+  }));
+} 
+
+async updateBatch(lombaId: number, dto: UpdateBatchDto) {
+    const { batch, pesertaIds } = dto;
+
+    // pastikan lomba ada
+    const lomba = await this.lombaRepo.findOne({ where: { id: lombaId } });
+    if (!lomba) throw new BadRequestException('Lomba tidak ditemukan');
+
+    // update batch untuk peserta terpilih
+    await this.pesertaRepo.update(
+      { id_pendaftaran: In(pesertaIds), lomba: { id: lombaId } },
+      { batch },
+    );
+
+    return { message: 'Batch berhasil disimpan', batch, pesertaIds };
   }
+  
+  // src/peserta/peserta.service.ts
+async updatePointSesiBulk(lombaId: number, data: UpdatePointSesiDto[]) {
+  for (const dto of data) {
+    const { pesertaId, sesi, finish, point } = dto;
+
+    await this.pointSesiRepo
+  .createQueryBuilder()
+  .insert()
+  .into(PointSesi)
+  .values({
+    peserta: { id_pendaftaran: pesertaId },
+    sesi,
+    finish: finish ?? undefined,   // ✅ jangan pakai null
+    point: point ?? 0,
+  })
+  .orUpdate(['finish', 'point'], ['peserta', 'sesi'])
+  .execute();
+
+  }
+
+  return { message: "Finish berhasil disimpan", count: data.length };
 }
+
+
+
+}
+
+
+
+
+

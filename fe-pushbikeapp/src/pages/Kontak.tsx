@@ -1,5 +1,6 @@
 // src/pages/Kontak.tsx
 import { useState } from "react";
+import axios from "axios";
 
 export default function Kontak() {
   const [formData, setFormData] = useState({
@@ -8,17 +9,27 @@ export default function Kontak() {
     pesan: "",
   });
 
+  const [loading, setLoading] = useState(false);
+
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Pesan terkirim:", formData);
-    setFormData({ nama: "", email: "", pesan: "" });
-    alert("Pesan berhasil dikirim!");
+    setLoading(true);
+    try {
+      await axios.post("http://localhost:3000/pesan", formData);
+      alert("Pesan berhasil dikirim!");
+      setFormData({ nama: "", email: "", pesan: "" });
+    } catch (error) {
+      console.error("Gagal mengirim pesan:", error);
+      alert("Terjadi kesalahan, coba lagi nanti.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -34,7 +45,7 @@ export default function Kontak() {
           <div className="w-full h-64 rounded-xl overflow-hidden shadow-lg border border-[#00ADB5]">
             <iframe
               title="Lokasi Kami"
-              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3959.296369807405!2d107.60981047499602!3d-6.917463167651262!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2e68e62f7be6c3b1%3A0x401e8f1fc28e770!2sBandung!5e0!3m2!1sid!2sid!4v1698240700000!5m2!1sid!2sid"
+              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3964.9140529542847!2d107.14429617498707!3d-6.283554993714838!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2e6999b7e8f9e4c7%3A0x401576d14fed790!2sCikarang%20Selatan%2C%20Bekasi%2C%20Jawa%20Barat!5e0!3m2!1sid!2sid!4v1698240700000!5m2!1sid!2sid"
               width="100%"
               height="100%"
               style={{ border: 0 }}
@@ -52,7 +63,7 @@ export default function Kontak() {
               Jika ada pertanyaan terkait event atau registrasi, silakan hubungi
               kami melalui:
             </p>
-            <p>📍 Bandung, Indonesia</p>
+            <p>📍 Cikarang, Indonesia</p>
             <p>📞 +62 812 3456 7890</p>
             <p>📧 info@pushbikeweb.com</p>
 
@@ -100,8 +111,9 @@ export default function Kontak() {
             <button
               type="submit"
               className="w-full bg-[#00ADB5] hover:bg-[#0097a7] text-[#EEEEEE] py-3 rounded-lg transition font-semibold"
+              disabled={loading}
             >
-              Kirim Pesan
+              {loading ? "Mengirim..." : "Kirim Pesan"}
             </button>
           </form>
         </div>

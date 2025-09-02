@@ -23,6 +23,12 @@ export class LombaController {
     return this.lombaService.findAll();
   }
 
+  @Get(':id')
+findOne(@Param('id', ParseIntPipe) id: number): Promise<Lomba | null> {
+  return this.lombaService.findOne(id);
+}
+
+
   @Post()
   create(@Body() dto: CreateLombaDto): Promise<Lomba> {
     return this.lombaService.create(dto);
@@ -40,4 +46,13 @@ export class LombaController {
   remove(@Param('id', ParseIntPipe) id: number) {
     return this.lombaService.remove(id);
   }
+
+  @Post(':id/hasil')
+simpanHasil(
+  @Param('id', ParseIntPipe) id: number,
+  @Body() body: { moto: string; peserta: any[] },
+) {
+  return this.lombaService.simpanHasil(id, body.moto, body.peserta);
+}
+
 }

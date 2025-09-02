@@ -1,18 +1,18 @@
 // src/pages/Admin/KelolaLomba.tsx
-import { useEffect, useState, type ReactNode } from "react";
+import { useEffect, useState } from "react";
 import api from "@/services/api";
-import KelolaDataLombaModal from "@/pages/Form/KelolaDataLombaForm";
+import { useNavigate } from "react-router-dom";
 
 interface Lomba {
-  jumlahPeserta: ReactNode;
   id: number;
   nama: string;
   kategori: string;
+  jumlahPeserta: number;
 }
 
 export default function KelolaLomba() {
   const [lombaList, setLombaList] = useState<Lomba[]>([]);
-  const [selectedLomba, setSelectedLomba] = useState<Lomba | null>(null);
+  const navigate = useNavigate();
 
   const fetchLomba = async () => {
     try {
@@ -46,7 +46,7 @@ export default function KelolaLomba() {
                 <p className="text-[#EEEEEE]/70 text-sm">Jumlah Peserta: {lomba.jumlahPeserta}</p>
               </div>
               <button
-                onClick={() => setSelectedLomba(lomba)}
+                onClick={() => navigate(`/admindashboard/kelolapeserta/${lomba.id}`)}
                 className="px-4 py-2 bg-[#00ADB5] text-[#222831] font-medium rounded-lg hover:bg-[#00bfc8] transition"
               >
                 Kelola
@@ -54,13 +54,6 @@ export default function KelolaLomba() {
             </div>
           ))}
         </div>
-      )}
-
-      {selectedLomba && (
-        <KelolaDataLombaModal
-          lomba={selectedLomba}
-          onClose={() => setSelectedLomba(null)}
-        />
       )}
     </div>
   );

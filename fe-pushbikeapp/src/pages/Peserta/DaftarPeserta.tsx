@@ -97,12 +97,12 @@ export default function DaftarPeserta() {
                       </tr>
                     </thead>
                     <tbody>
-                      {pesertaByLomba[lomba.id].map((peserta) => (
+                      {pesertaByLomba[lomba.id].map((peserta, index) => (
                         <tr
                           key={peserta.id_pendaftaran}
                           className="border-t border-[#EEEEEE]/20 hover:bg-[#00ADB5]/20"
                         >
-                          <td className="px-2 py-1">{peserta.id_pendaftaran}</td>
+                          <td className="px-2 py-1">{index +1}</td>
                           <td className="px-2 py-1">{peserta.nama}</td>
                           <td className="px-2 py-1">{peserta.kategori}</td>
                           <td className="px-2 py-1">{peserta.platNumber}</td>

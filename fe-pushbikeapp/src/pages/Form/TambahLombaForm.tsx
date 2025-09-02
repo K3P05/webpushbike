@@ -10,31 +10,31 @@ interface TambahLombaModalProps {
 
 export default function TambahLombaModal({ onClose, onSuccess }: TambahLombaModalProps) {
   const [form, setForm] = useState<{
-  nama: string;
-  tanggal: string;
-  jumlah_peserta: number;
-  biaya: number;
-  kategori: Kategori;
-}>({
-  nama: "",
-  tanggal: "",
-  jumlah_peserta: 1,
-  biaya: 0,
-  kategori: "boy", // default harus sesuai enum
-});
-
+    nama: string;
+    tanggal: string;
+    jumlah_peserta: number;
+    biaya: number;
+    kategori: Kategori;
+    jumlah_batch: number; // tambahkan field ini
+  }>({
+    nama: "",
+    tanggal: "",
+    jumlah_peserta: 1,
+    biaya: 0,
+    kategori: "boy", // default harus sesuai enum
+    jumlah_batch: 1, // default 1
+  });
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-  const { name, value } = e.target;
-  setForm({
-    ...form,
-    [name]: name === "kategori" ? (value as Kategori) : value,
-  });
-};
-
+    const { name, value } = e.target;
+    setForm({
+      ...form,
+      [name]: name === "kategori" ? (value as Kategori) : Number(value) || value,
+    });
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -47,10 +47,12 @@ export default function TambahLombaModal({ onClose, onSuccess }: TambahLombaModa
         tanggal: form.tanggal,
         jumlahPeserta: Number(form.jumlah_peserta),
         biaya: Number(form.biaya),
-        kategori: form.kategori, // tambahkan kategori ke DTO
+        kategori: form.kategori,
+        jumlahBatch: Number(form.jumlah_batch), // kirim ke backend
       });
 
       onSuccess();
+      alert("Data lomba berhasil disimpan!")
       onClose();
     } catch (err: any) {
       console.error("Gagal tambah lomba:", err);
@@ -102,6 +104,19 @@ export default function TambahLombaModal({ onClose, onSuccess }: TambahLombaModa
               type="number"
               name="jumlah_peserta"
               value={form.jumlah_peserta}
+              onChange={handleChange}
+              min={1}
+              className="w-full p-2 rounded-lg bg-[#222831] text-[#EEEEEE] border border-[#00ADB5] focus:outline-none focus:ring-2 focus:ring-[#00ADB5]"
+              required
+            />
+          </div>
+
+          <div>
+            <label className="block mb-1 font-medium">Jumlah Batch</label>
+            <input
+              type="number"
+              name="jumlah_batch"
+              value={form.jumlah_batch}
               onChange={handleChange}
               min={1}
               className="w-full p-2 rounded-lg bg-[#222831] text-[#EEEEEE] border border-[#00ADB5] focus:outline-none focus:ring-2 focus:ring-[#00ADB5]"

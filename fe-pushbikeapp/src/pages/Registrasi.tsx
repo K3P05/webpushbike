@@ -13,12 +13,11 @@ type LombaType = {
   deskripsi?: string;
   jumlahPeserta: number;
   biaya: number;
-  kategori: Kategori; // tambahkan kategori
+  kategori: Kategori;
 };
 
 export default function Registrasi() {
   const navigate = useNavigate();
-
   const [lombaList, setLombaList] = useState<LombaType[]>([]);
   const [selectedLomba, setSelectedLomba] = useState<LombaType | null>(null);
   const [formData, setFormData] = useState({
@@ -69,26 +68,50 @@ export default function Registrasi() {
   };
 
   return (
-    <div className="min-h-screen bg-[#222831] p-6 font-poppins">
-      <h1 className="text-3xl font-bold text-center mb-8 text-[#00ADB5]">Pilih Lomba</h1>
+    <div className="p-6 max-w-3xl mx-auto bg-[#222831] min-h-screen font-poppins">
+      <h1 className="text-3xl font-bold text-[#00ADB5] mb-6 text-center">
+        Pilih Lomba untuk Daftar 🚴
+      </h1>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      {/* Daftar Lomba */}
+      <div className="flex flex-col gap-4">
         {lombaList.map((lomba) => (
           <div
             key={lomba.id}
-            className="bg-[#393E46] border border-[#222831] shadow-sm rounded-2xl p-6 cursor-pointer hover:shadow-lg hover:border-[#00ADB5] transition"
-            onClick={() => setSelectedLomba(lomba)}
+            className="bg-[#393E46] shadow-lg rounded-xl p-4 flex flex-col justify-between hover:shadow-xl transition"
           >
-            <h2 className="text-xl font-semibold text-[#EEEEEE]">{lomba.nama}</h2>
-            <p className="text-[#EEEEEE]/80 mt-1">Tanggal: {new Date(lomba.tanggal).toLocaleDateString()}</p>
-            <p className="text-[#EEEEEE]/70 mt-1">Kuota: {lomba.jumlahPeserta}</p>
-            <p className="text-[#00ADB5] font-semibold mt-1">Biaya: Rp {lomba.biaya.toLocaleString()}</p>
-            <p className="text-[#EEEEEE]/80 mt-1">Kategori: <span className="text-[#00ADB5] font-semibold">{lomba.kategori}</span></p>
-            {lomba.deskripsi && <p className="text-[#EEEEEE] mt-2">{lomba.deskripsi}</p>}
+            <div>
+              <h2 className="text-lg font-semibold text-[#EEEEEE]">{lomba.nama}</h2>
+              <p className="text-gray-300 text-sm">
+                {new Date(lomba.tanggal).toLocaleDateString()}
+              </p>
+              {lomba.kategori && (
+                <p className="mt-1 font-semibold">
+                  Kategori:{" "}
+                  <span
+                    className={
+                      lomba.kategori === "boy"
+                        ? "text-blue-400"
+                        : "text-pink-400"
+                    }
+                  >
+                    {lomba.kategori}
+                  </span>
+                </p>
+              )}
+            </div>
+
+            <button
+              onClick={() => setSelectedLomba(lomba)}
+              className="mt-4 w-full bg-blue-400 hover:bg-blue-600 text-[#EEEEEE] font-semibold px-2 py-1 rounded-lg shadow transition"
+            >
+              Daftar
+            </button>
           </div>
         ))}
       </div>
 
+      {/* Modal Registrasi */}
       {selectedLomba && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
           <div className="bg-[#393E46] rounded-2xl shadow-lg w-full max-w-md p-6 relative">
@@ -99,13 +122,27 @@ export default function Registrasi() {
               ✖
             </button>
 
-            <h2 className="text-2xl font-bold mb-6 text-center text-[#00ADB5]">Registrasi {selectedLomba.nama}</h2>
+            <h2 className="text-2xl font-bold mb-6 text-center text-[#00ADB5]">
+              Registrasi {selectedLomba.nama}
+            </h2>
 
             <p className="text-[#EEEEEE]/80 mb-2 text-center">
-              Biaya pendaftaran: <span className="text-[#00ADB5] font-semibold">Rp {selectedLomba.biaya.toLocaleString()}</span>
+              Biaya pendaftaran:{" "}
+              <span className="text-[#00ADB5] font-semibold">
+                Rp {selectedLomba.biaya.toLocaleString()}
+              </span>
             </p>
             <p className="text-[#EEEEEE]/80 mb-4 text-center">
-              Kategori lomba: <span className="text-[#00ADB5] font-semibold">{selectedLomba.kategori}</span>
+              Kategori lomba:{" "}
+              <span
+                className={
+                  selectedLomba.kategori === "girl"
+                    ? "text-pink-400 font-semibold"
+                    : "text-blue-400 font-semibold"
+                }
+              >
+                {selectedLomba.kategori}
+              </span>
             </p>
 
             <form onSubmit={handleSubmit}>
@@ -161,7 +198,7 @@ export default function Registrasi() {
 
               <button
                 type="submit"
-                className="w-full bg-[#00ADB5] hover:bg-[#EEEEEE] hover:text-[#222831] text-white font-semibold p-3 rounded-lg shadow-md transition"
+                className="w-full bg-blue-400 hover:bg-blue-600 text-[#EEEEEE] font-semibold p-3 rounded-lg shadow-md transition"
               >
                 Daftar
               </button>

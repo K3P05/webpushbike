@@ -1,7 +1,9 @@
 /* eslint-disable prettier/prettier */
+/* eslint-disable prettier/prettier */
 // src/peserta/entities/peserta.entity.ts
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn, OneToMany } from 'typeorm';
 import { Lomba } from '../../lomba/entities/lomba.entity';
+import { PointSesi } from './point_sesi.entity';
 
 export type Kategori = 'boy' | 'girl';
 
@@ -25,6 +27,12 @@ export class Peserta {
   @Column({ type: 'int', default: 0 })
   point2: number;
 
+  @OneToMany(() => PointSesi, pointSesi => pointSesi.peserta, { cascade: true })
+  pointsesi: PointSesi[];
+
+  @Column({ type: 'int', nullable: true })
+  batch: number;
+
   @Column({ type: 'enum', enum: ['boy', 'girl'] })
   kategori: Kategori;
 
@@ -34,4 +42,7 @@ export class Peserta {
   @ManyToOne(() => Lomba, (lomba) => lomba.peserta, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'lomba_id' })
   lomba: Lomba;
+
+  @OneToMany(() => PointSesi, (pointSesi) => pointSesi.peserta, { cascade: true })
+  pointSesi: PointSesi[];
 }

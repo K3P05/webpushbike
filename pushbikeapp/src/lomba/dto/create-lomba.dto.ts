@@ -15,6 +15,10 @@ export class CreateLombaDto {
   jumlahPeserta: number;
 
   @IsInt()
+  @Min(1)
+  jumlahBatch: number; 
+
+  @IsInt()
   @Min(0)
   biaya: number;
 

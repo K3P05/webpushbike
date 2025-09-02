@@ -33,9 +33,9 @@ export default function AdminDashboard() {
   const menuItems: MenuItem[] = [
     { title: "➕ Tambah Lomba", desc: "Tambahkan lomba baru", action: () => setOpenModal(true) },
     { title: "➕ Kelola Data Lomba", desc: "Pengelolaan data lomba yang sudah ada", path: "kelolalomba" },
-    { title: "➕ Hasil Live", desc: "Isi Hasil Lomba Secara Live", path: "hasillive" },
     { title: "👥 Daftar Peserta", desc: "Lihat dan kelola peserta", path: "daftarpeserta" },
     { title: "📋 Daftar Lomba", desc: `Semua lomba (${lombaCount})`, path: "daftarlomba" },
+    { title: "📩 Lihat Pesan", desc: `Semua Pesan Yang Masuk`, path: "lihatpesan" },
     { title: "📊 Statistik", desc: "Statistik lomba & peserta", path: "statistik" },
   ];
 

@@ -24,6 +24,9 @@ export class Lomba {
   @Column()
   jumlahPeserta: number; // kuota
 
+  @Column({ type: 'int', default: 1 }) // tambahkan jumlah_batch
+  jumlahBatch: number;
+
   @Column()
   biaya: number; // biaya pendaftaran
 
