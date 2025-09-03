@@ -1,5 +1,4 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-// src/pages/Statistik.tsx
+ // src/pages/Statistik.tsx
 import { useEffect, useState } from "react";
 import api from "@/services/api";
 import {
@@ -21,29 +20,17 @@ export default function Statistik() {
   const COLORS = ["#00ADB5", "#222831", "#393E46", "#EEEEEE"];
 
   const fetchStatistik = async () => {
-    try {
-      const res = await api.get("/lomba");
-      const lombaList = res.data ?? [];
+  try {
+    const res = await api.get("/statistik");
+    const withCounts = res.data ?? [];
 
-      // hitung jumlah peserta per lomba
-      const withCounts = await Promise.all(
-        lombaList.map(async (l: any) => {
-          const pesertaRes = await api.get(`/peserta/lomba/${l.id}`);
-          return {
-            id: l.id,
-            nama: l.nama,
-            pesertaCount: pesertaRes.data.length,
-            batchCount: l.batch ?? 0, // opsional kalau batch sudah disimpan
-          };
-        })
-      );
+    setLombaData(withCounts);
+    setTotalPeserta(withCounts.reduce((acc, l) => acc + l.pesertaCount, 0));
+  } catch (err) {
+    console.error("Gagal fetch statistik", err);
+  }
+};
 
-      setLombaData(withCounts);
-      setTotalPeserta(withCounts.reduce((acc, l) => acc + l.pesertaCount, 0));
-    } catch (err) {
-      console.error("Gagal fetch statistik", err);
-    }
-  };
 
   useEffect(() => {
     fetchStatistik();

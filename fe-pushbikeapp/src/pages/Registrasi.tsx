@@ -17,7 +17,6 @@ type LombaType = {
 
 export default function Registrasi() {
   const navigate = useNavigate();
-
   const [lombaList, setLombaList] = useState<LombaType[]>([]);
   const [selectedLomba, setSelectedLomba] = useState<LombaType | null>(null);
   const [formData, setFormData] = useState({
@@ -65,49 +64,50 @@ export default function Registrasi() {
   };
 
   return (
-    <div className="min-h-screen bg-base-dark p-6 font-poppins">
+    <div className="p-6 max-w-3xl mx-auto bg-[#222831] min-h-screen font-poppins">
+      <h1 className="text-3xl font-bold text-[#00ADB5] mb-6 text-center">
+        Pilih Lomba untuk Daftar 🚴
+      </h1>
 
-      {/* Header */}
-      <div className="text-center mb-12 mt-10">
-        <h2 className="text-4xl font-extrabold text-textlight tracking-wide drop-shadow-md">
-          Ayo Ikut Kompetisi!
-        </h2>
-        <p className="text-textlight/70 mt-3 max-w-2xl mx-auto">
-          Pilih lomba favoritmu dan segera daftar sebelum kuota habis 🚴‍♂️🏆
-        </p>
-      </div>
-
-      {/* Card List */}
-      <div className="flex justify-start gap-8 ml-[72px] flex-wrap">
+      {/* Daftar Lomba */}
+      <div className="flex flex-col gap-4">
         {lombaList.map((lomba) => (
           <div
             key={lomba.id}
-            className="bg-gradient-to-br from-[#1b252f] to-[#222b36]/90
-                      border border-white/10
-                      shadow-md hover:shadow-[0_0_20px_rgba(0,173,181,0.3)]
-                      rounded-2xl p-6 md:p-8 
-                      cursor-pointer transform hover:-translate-y-2 transition-all duration-300 w-64"
-            onClick={() => setSelectedLomba(lomba)}
+            className="bg-[#393E46] shadow-lg rounded-xl p-4 flex flex-col justify-between hover:shadow-xl transition"
           >
-            <h2 className="text-2xl font-bold text-textlight">{lomba.nama}</h2>
-            <p className="text-textlight/80 mt-2">
-              📅 {new Date(lomba.tanggal).toLocaleDateString()}
-            </p>
-            <p className="text-textlight/80">👥 Kuota: {lomba.jumlahPeserta}</p>
-            <p className="text-textlight font-semibold mt-2">
-              💰 Rp {lomba.biaya.toLocaleString()}
-            </p>
-            <p className="text-textlight mt-1">
-              🏆 <span className="text-accent font-semibold">{lomba.kategori}</span>
-            </p>
-            {lomba.deskripsi && (
-              <p className="text-textlight/70 mt-3 line-clamp-3">{lomba.deskripsi}</p>
-            )}
+            <div>
+              <h2 className="text-lg font-semibold text-[#EEEEEE]">{lomba.nama}</h2>
+              <p className="text-gray-300 text-sm">
+                {new Date(lomba.tanggal).toLocaleDateString()}
+              </p>
+              {lomba.kategori && (
+                <p className="mt-1 font-semibold">
+                  Kategori:{" "}
+                  <span
+                    className={
+                      lomba.kategori === "boy"
+                        ? "text-blue-400"
+                        : "text-pink-400"
+                    }
+                  >
+                    {lomba.kategori}
+                  </span>
+                </p>
+              )}
+            </div>
+
+            <button
+              onClick={() => setSelectedLomba(lomba)}
+              className="mt-4 w-full bg-blue-400 hover:bg-blue-600 text-[#EEEEEE] font-semibold px-2 py-1 rounded-lg shadow transition"
+            >
+              Daftar
+            </button>
           </div>
         ))}
       </div>
 
-      {/* Modal */}
+      {/* Modal Registrasi */}
       {selectedLomba && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex justify-center items-center z-50">
           <div className="bg-[#2E3440] rounded-2xl shadow-2xl w-full max-w-md p-8 relative 
@@ -120,26 +120,28 @@ export default function Registrasi() {
             >
               ✖
             </button>
-
-            {/* Title */}
-            <h2 className="text-2xl font-bold mb-6 text-center text-textlight">
+            <h2 className="text-2xl font-bold mb-6 text-center text-[#00ADB5]">
               Registrasi {selectedLomba.nama}
             </h2>
 
-            {/* Info lomba */}
-            <div className="text-center mb-6 space-y-2">
-              <p className="text-textlight">
-                Biaya:{" "}
-                <span className="text-accent font-semibold">
-                  Rp {selectedLomba.biaya.toLocaleString()}
-                </span>
-              </p>
-              <p className="text-textlight">
-                Kategori:{" "}
-                <span className="text-accent font-semibold">{selectedLomba.kategori}</span>
-              </p>
-            </div>
-
+            <p className="text-[#EEEEEE]/80 mb-2 text-center">
+              Biaya pendaftaran:{" "}
+              <span className="text-[#00ADB5] font-semibold">
+                Rp {selectedLomba.biaya.toLocaleString()}
+              </span>
+            </p>
+            <p className="text-[#EEEEEE]/80 mb-4 text-center">
+              Kategori lomba:{" "}
+              <span
+                className={
+                  selectedLomba.kategori === "girl"
+                    ? "text-pink-400 font-semibold"
+                    : "text-blue-400 font-semibold"
+                }
+              >
+                {selectedLomba.kategori}
+              </span>
+            </p>
             {/*Form*/}
             <form onSubmit={handleSubmit} className="space-y-4">
               {["nama", "plat_number", "community"].map((field) => (
@@ -178,8 +180,7 @@ export default function Registrasi() {
               {/* Submit */}
               <button
                 type="submit"
-                className="w-full bg-accent text-white font-semibold p-3 rounded-lg shadow-md 
-                          hover:bg-accent/80 hover:shadow-lg transition-all duration-300">
+                className="w-full bg-blue-400 hover:bg-blue-600 text-[#EEEEEE] font-semibold p-3 rounded-lg shadow-md transition"
                 Daftar
               </button>
             </form>

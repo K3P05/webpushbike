@@ -6,10 +6,13 @@ import { PesertaService } from './peserta.service';
 import { PesertaController } from './peserta.controller';
 import { Peserta } from './entities/peserta.entity';
 import { Lomba } from '../lomba/entities/lomba.entity';
+import { PointSesi } from './entities/point_sesi.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Peserta, Lomba]), // <- pastikan ini ada
+    TypeOrmModule.forFeature([Peserta, Lomba, PointSesi
+      
+    ]), // <- pastikan ini ada
   ],
   providers: [PesertaService],
   controllers: [PesertaController],

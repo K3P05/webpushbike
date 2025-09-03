@@ -9,6 +9,7 @@ interface EditLombaModalProps {
     nama: string;
     tanggal: string;
     jumlahPeserta: number;
+    jumlahBatch?: number; // <- tambahkan optional jumlahBatch
     biaya: number;
     kategori: Kategori;
   };
@@ -21,6 +22,7 @@ export default function EditLombaModal({ lomba, onClose, onSuccess }: EditLombaM
     nama: "",
     tanggal: "",
     jumlahPeserta: 1,
+    jumlahBatch: 1, // <- default 1
     biaya: 0,
     kategori: "boy" as Kategori,
   });
@@ -33,8 +35,9 @@ export default function EditLombaModal({ lomba, onClose, onSuccess }: EditLombaM
     if (lomba) {
       setForm({
         nama: lomba.nama,
-        tanggal: lomba.tanggal.split("T")[0], // pastikan format YYYY-MM-DD
+        tanggal: lomba.tanggal.split("T")[0], // format YYYY-MM-DD
         jumlahPeserta: lomba.jumlahPeserta,
+        jumlahBatch: lomba.jumlahBatch ?? 1, // ambil dari lomba jika ada
         biaya: lomba.biaya,
         kategori: lomba.kategori,
       });
@@ -46,7 +49,11 @@ export default function EditLombaModal({ lomba, onClose, onSuccess }: EditLombaM
     setForm({
       ...form,
       [name]:
-        name === "kategori" ? (value as Kategori) : name === "jumlahPeserta" || name === "biaya" ? Number(value) : value,
+        name === "kategori"
+          ? (value as Kategori)
+          : name === "jumlahPeserta" || name === "biaya" || name === "jumlahBatch"
+          ? Number(value)
+          : value,
     });
   };
 
@@ -60,6 +67,7 @@ export default function EditLombaModal({ lomba, onClose, onSuccess }: EditLombaM
         nama: form.nama,
         tanggal: form.tanggal,
         jumlahPeserta: form.jumlahPeserta,
+        jumlahBatch: form.jumlahBatch, // <- kirim ke backend
         biaya: form.biaya,
         kategori: form.kategori,
       });
@@ -118,6 +126,19 @@ export default function EditLombaModal({ lomba, onClose, onSuccess }: EditLombaM
               type="number"
               name="jumlahPeserta"
               value={form.jumlahPeserta}
+              onChange={handleChange}
+              min={1}
+              className="w-full p-2 rounded-lg bg-[#222831] text-[#EEEEEE] border border-[#00ADB5] focus:outline-none focus:ring-2 focus:ring-[#00ADB5]"
+              required
+            />
+          </div>
+
+          <div>
+            <label className="block mb-1 font-medium">Jumlah Batch</label>
+            <input
+              type="number"
+              name="jumlahBatch"
+              value={form.jumlahBatch}
               onChange={handleChange}
               min={1}
               className="w-full p-2 rounded-lg bg-[#222831] text-[#EEEEEE] border border-[#00ADB5] focus:outline-none focus:ring-2 focus:ring-[#00ADB5]"

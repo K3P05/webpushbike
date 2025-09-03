@@ -2,19 +2,22 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import MainLayout from './layout/MainLayout';
 import Dashboard from './pages/Dashboard/Dashboard';
 import Registrasi from './pages/Registrasi';
-import TentangKami from './pages/TentangKami';
 import Kontak from './pages/Kontak'
 import LoginAdmin from './pages/Login/LoginAdmin';
 import AdminDashboard from './pages/Dashboard/AdminDashboard';
 import ResultList from './pages/HasilLomba';
-import ResultLayout from '@/pages/Hasil';
-import LiveResult from './pages/Hasil/LiveResult';
-import UserForm from '@/pages/Hasil/ResultForm';
 import TambahLomba from './pages/Lomba/TambahLomba'; 
 import DaftarPeserta from './pages/Peserta/DaftarPeserta';
 import DaftarLomba from './pages/Lomba/DaftarLomba';
 import KelolaLomba from './pages/Lomba/KelolaLomba';
 import Statistik from './pages/Statistik';
+import KelolaPeserta from './pages/Peserta/KelolaPeserta';
+import OlahDataPeserta from './pages/Peserta/OlahDataPeserta';
+import InputHasilLomba from './pages/Form/InputHasilLomba';
+import SesiLanjutanLomba from './pages/Lomba/SesiLanjutanLomba';
+import SesiLanjutanLomba2 from './pages/Lomba/SesiLanjutanLomba2';
+import LiveHasil from './pages/Hasil/LiveHasil';
+import LihatPesan from './pages/Peserta/LihatPesan';
 
 function App() {
   return (
@@ -26,9 +29,9 @@ function App() {
           {/* Dashboard */}
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/registrasi" element={<Registrasi />} />
-          <Route path="/tentangkami" element={<TentangKami />} />
           <Route path="/kontak" element={<Kontak />} />
           <Route path="/resultlist" element={<ResultList />} />
+          <Route path="/livehasil/:id" element={<LiveHasil />} />
           <Route path="/loginadmin" element={<LoginAdmin />} />
           <Route path="/admindashboard" element={<AdminDashboard />} />
 
@@ -37,13 +40,15 @@ function App() {
           <Route path="/admindashboard/daftarpeserta" element={<DaftarPeserta />} />
           <Route path="/admindashboard/daftarlomba" element={<DaftarLomba />} />
           <Route path="/admindashboard/kelolalomba" element={<KelolaLomba />} />
+          <Route path="/admindashboard/kelolapeserta/:id" element={<KelolaPeserta />} />
+          <Route path="/admindashboard/olahdatapeserta/:id" element={<OlahDataPeserta />} />
+          <Route path="/admindashboard/lihatpesan" element={<LihatPesan />} />
+          <Route path="/sesilanjutanlomba/:id" element={<SesiLanjutanLomba />} />
+          <Route path="/sesilanjutanlomba2/:id" element={<SesiLanjutanLomba2 />} />
+          <Route path="/inputhasillomba/:moto/:id" element={<InputHasilLomba />} />
           <Route path="/admindashboard/statistik" element={<Statistik />} />
 
-          {/* Nested route untuk Result */}
-          <Route path="/result" element={<ResultLayout />}>
-            <Route index element={<LiveResult />} />
-            <Route path="new" element={<UserForm />} />
-          </Route>
+          {/* Nested route untuk Hasil */}
         </Routes>
       </MainLayout>
     </Router>

@@ -6,6 +6,7 @@ import EditLombaModal from "@/pages/Form/EditLombaForm";
 export default function DaftarLomba() {
   const [lombas, setLombas] = useState<any[]>([]);
   const [editData, setEditData] = useState<any | null>(null);
+  const [loadingDelete, setLoadingDelete] = useState<number | null>(null); // track delete loading
 
   // ambil data dari backend
   const fetchData = async () => {
@@ -17,14 +18,19 @@ export default function DaftarLomba() {
     }
   };
 
-  // hapus data lomba
+  // hapus data lomba beserta peserta
   const handleDelete = async (id: number) => {
-    if (!confirm("Apakah yakin ingin menghapus lomba ini?")) return;
+    if (!confirm("Apakah yakin ingin menghapus lomba ini beserta semua pesertanya?")) return;
     try {
-      await deleteLomba(id);
-      fetchData();
+      setLoadingDelete(id); // set loading untuk tombol tertentu
+      await deleteLomba(id); // pastikan backend hapus lomba + peserta
+      await fetchData(); // refresh daftar lomba
+      alert("Lomba berhasil dihapus.");
     } catch (err) {
       console.error("Gagal hapus lomba:", err);
+      alert("Gagal menghapus lomba.");
+    } finally {
+      setLoadingDelete(null);
     }
   };
 
@@ -48,13 +54,16 @@ export default function DaftarLomba() {
               <p className="text-sm opacity-80 mb-1">
                 Kuota: {lomba.jumlahPeserta}
               </p>
+              <p className="text-sm opacity-80 mb-1">
+                Batch: {lomba.jumlahBatch}
+              </p>
               <p className="text-sm opacity-80 mb-1">Biaya: Rp {lomba.biaya}</p>
               <p className="text-sm opacity-80 mb-3">
                 Kategori: {lomba.kategori}
               </p>
             </div>
 
-            {/* Tombol di kanan bawah */}
+            {/* Tombol Edit & Hapus */}
             <div className="flex justify-end gap-2 mt-4">
               <button
                 onClick={() => setEditData(lomba)}
@@ -64,9 +73,14 @@ export default function DaftarLomba() {
               </button>
               <button
                 onClick={() => handleDelete(lomba.id)}
-                className="px-4 py-2 rounded-lg bg-red-500 hover:bg-red-600 text-white"
+                disabled={loadingDelete === lomba.id} // disable saat loading
+                className={`px-4 py-2 rounded-lg text-white ${
+                  loadingDelete === lomba.id
+                    ? "bg-red-400 cursor-not-allowed"
+                    : "bg-red-500 hover:bg-red-600"
+                }`}
               >
-                Hapus
+                {loadingDelete === lomba.id ? "Menghapus..." : "Hapus"}
               </button>
             </div>
           </div>
