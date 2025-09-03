@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 // src/components/pages/Lomba/TambahLomba.tsx
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -59,161 +60,165 @@ export default function TambahLomba() {
   };
 
   const handleTambahkanLomba = () => {
-    // simpan ke localStorage sementara (belum ada backend)
     localStorage.setItem("lombaData", JSON.stringify(batches));
     navigate("/result");
   };
 
   return (
-    <div className="p-6">
-      {!formData ? (
-        <LombaForm onSubmit={handleFormSubmit} />
-      ) : (
-        <div>
-          <h2 className="text-xl font-bold mb-4">
-            🏁 {formData.nama} ({formData.kategori}) - {formData.tanggal}
-          </h2>
+    <div className="min-h-screen bg-[#222831] p-6 flex items-start justify-center font-poppins">
+      <div className="bg-[#EEEEEE] shadow-lg rounded-xl p-6 w-full max-w-5xl">
+        {!formData ? (
+          <LombaForm onSubmit={handleFormSubmit} />
+        ) : (
+          <div>
+            <h2 className="text-2xl font-bold mb-6 text-center text-[#222831]">
+              🏁 {formData.nama} ({formData.kategori}) - {formData.tanggal}
+            </h2>
 
-          <div className="flex gap-3 mb-4">
-            <button
-              className="px-4 py-2 bg-orange-600 text-white rounded hover:bg-orange-700"
-              onClick={() => setShowPesertaForm(true)}
-            >
-              Input Peserta
-            </button>
-            <button
-              className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
-              onClick={handleTambahkanLomba}
-            >
-              Tambahkan Lomba
-            </button>
-          </div>
-
-          {batches.map((pesertaBatch, batchIdx) => (
-            <div key={batchIdx} className="mb-8">
-              {batches.length > 1 && (
-                <h3 className="text-lg font-semibold mb-2">
-                  Batch {batchIdx + 1}
-                </h3>
-              )}
-              <div className="overflow-x-auto rounded-lg shadow border">
-                <table className="min-w-full text-sm text-left">
-                  <thead className="bg-gray-100 text-gray-700 uppercase">
-                    <tr>
-                      <th className="px-4 py-3 border">Nama Peserta</th>
-                      <th className="px-4 py-3 border">No Plat</th>
-                      <th className="px-4 py-3 border">Asal Komunitas</th>
-                      <th className="px-4 py-3 border text-center">Point 1</th>
-                      <th className="px-4 py-3 border text-center">Point 2</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {pesertaBatch.map((u) => (
-                      <tr key={u.id_pendaftaran}>
-                        <td className="px-4 py-2 border">
-                          {showPesertaForm ? (
-                            <input
-                              type="text"
-                              value={u.nama}
-                              onChange={(e) =>
-                                handlePesertaChange(
-                                  batchIdx,
-                                  u.id_pendaftaran,
-                                  "nama",
-                                  e.target.value
-                                )
-                              }
-                              className="border rounded px-2 py-1 w-full"
-                            />
-                          ) : (
-                            u.nama
-                          )}
-                        </td>
-                        <td className="px-4 py-2 border">
-                          {showPesertaForm ? (
-                            <input
-                              type="text"
-                              value={u.plat_number}
-                              onChange={(e) =>
-                                handlePesertaChange(
-                                  batchIdx,
-                                  u.id_pendaftaran,
-                                  "plat_number",
-                                  e.target.value
-                                )
-                              }
-                              className="border rounded px-2 py-1 w-full"
-                            />
-                          ) : (
-                            u.plat_number
-                          )}
-                        </td>
-                        <td className="px-4 py-2 border">
-                          {showPesertaForm ? (
-                            <input
-                              type="text"
-                              value={u.community}
-                              onChange={(e) =>
-                                handlePesertaChange(
-                                  batchIdx,
-                                  u.id_pendaftaran,
-                                  "community",
-                                  e.target.value
-                                )
-                              }
-                              className="border rounded px-2 py-1 w-full"
-                            />
-                          ) : (
-                            u.community
-                          )}
-                        </td>
-                        <td className="px-4 py-2 border text-center">
-                          {showPesertaForm ? (
-                            <input
-                              type="number"
-                              value={u.point1}
-                              onChange={(e) =>
-                                handlePesertaChange(
-                                  batchIdx,
-                                  u.id_pendaftaran,
-                                  "point1",
-                                  Number(e.target.value)
-                                )
-                              }
-                              className="border rounded px-2 py-1 w-full text-center"
-                            />
-                          ) : (
-                            u.point1
-                          )}
-                        </td>
-                        <td className="px-4 py-2 border text-center">
-                          {showPesertaForm ? (
-                            <input
-                              type="number"
-                              value={u.point2}
-                              onChange={(e) =>
-                                handlePesertaChange(
-                                  batchIdx,
-                                  u.id_pendaftaran,
-                                  "point2",
-                                  Number(e.target.value)
-                                )
-                              }
-                              className="border rounded px-2 py-1 w-full text-center"
-                            />
-                          ) : (
-                            u.point2
-                          )}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
+            <div className="flex gap-3 justify-center mb-6">
+              <button
+                className="px-4 py-2 bg-[#393E46] text-[#EEEEEE] rounded-lg hover:bg-[#222831] transition"
+                onClick={() => setShowPesertaForm(true)}
+              >
+                Input Peserta
+              </button>
+              <button
+                className="px-4 py-2 bg-[#00ADB5] text-[#EEEEEE] rounded-lg hover:bg-[#0099a3] transition"
+                onClick={handleTambahkanLomba}
+              >
+                Tambahkan Lomba
+              </button>
             </div>
-          ))}
-        </div>
-      )}
+
+            {batches.map((pesertaBatch, batchIdx) => (
+              <div key={batchIdx} className="mb-8">
+                {batches.length > 1 && (
+                  <h3 className="text-lg font-semibold mb-3 text-[#222831]">
+                    Batch {batchIdx + 1}
+                  </h3>
+                )}
+                <div className="overflow-x-auto rounded-lg shadow border border-[#393E46]">
+                  <table className="min-w-full text-sm text-left text-[#222831]">
+                    <thead className="bg-[#393E46] text-[#EEEEEE] uppercase">
+                      <tr>
+                        <th className="px-4 py-3 border border-[#222831]">Nama Peserta</th>
+                        <th className="px-4 py-3 border border-[#222831]">No Plat</th>
+                        <th className="px-4 py-3 border border-[#222831]">Asal Komunitas</th>
+                        <th className="px-4 py-3 border border-[#222831] text-center">Point 1</th>
+                        <th className="px-4 py-3 border border-[#222831] text-center">Point 2</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {pesertaBatch.map((u) => (
+                        <tr
+                          key={u.id_pendaftaran}
+                          className="odd:bg-[#EEEEEE] even:bg-[#f5f5f5] hover:bg-[#d9f9fa] transition"
+                        >
+                          <td className="px-4 py-2 border border-[#393E46]">
+                            {showPesertaForm ? (
+                              <input
+                                type="text"
+                                value={u.nama}
+                                onChange={(e) =>
+                                  handlePesertaChange(
+                                    batchIdx,
+                                    u.id_pendaftaran,
+                                    "nama",
+                                    e.target.value
+                                  )
+                                }
+                                className="border border-[#393E46] rounded px-2 py-1 w-full focus:outline-none focus:ring-2 focus:ring-[#00ADB5]"
+                              />
+                            ) : (
+                              u.nama
+                            )}
+                          </td>
+                          <td className="px-4 py-2 border border-[#393E46]">
+                            {showPesertaForm ? (
+                              <input
+                                type="text"
+                                value={u.plat_number}
+                                onChange={(e) =>
+                                  handlePesertaChange(
+                                    batchIdx,
+                                    u.id_pendaftaran,
+                                    "plat_number",
+                                    e.target.value
+                                  )
+                                }
+                                className="border border-[#393E46] rounded px-2 py-1 w-full focus:outline-none focus:ring-2 focus:ring-[#00ADB5]"
+                              />
+                            ) : (
+                              u.plat_number
+                            )}
+                          </td>
+                          <td className="px-4 py-2 border border-[#393E46]">
+                            {showPesertaForm ? (
+                              <input
+                                type="text"
+                                value={u.community}
+                                onChange={(e) =>
+                                  handlePesertaChange(
+                                    batchIdx,
+                                    u.id_pendaftaran,
+                                    "community",
+                                    e.target.value
+                                  )
+                                }
+                                className="border border-[#393E46] rounded px-2 py-1 w-full focus:outline-none focus:ring-2 focus:ring-[#00ADB5]"
+                              />
+                            ) : (
+                              u.community
+                            )}
+                          </td>
+                          <td className="px-4 py-2 border border-[#393E46] text-center">
+                            {showPesertaForm ? (
+                              <input
+                                type="number"
+                                value={u.point1}
+                                onChange={(e) =>
+                                  handlePesertaChange(
+                                    batchIdx,
+                                    u.id_pendaftaran,
+                                    "point1",
+                                    Number(e.target.value)
+                                  )
+                                }
+                                className="border border-[#393E46] rounded px-2 py-1 w-full text-center focus:outline-none focus:ring-2 focus:ring-[#00ADB5]"
+                              />
+                            ) : (
+                              u.point1
+                            )}
+                          </td>
+                          <td className="px-4 py-2 border border-[#393E46] text-center">
+                            {showPesertaForm ? (
+                              <input
+                                type="number"
+                                value={u.point2}
+                                onChange={(e) =>
+                                  handlePesertaChange(
+                                    batchIdx,
+                                    u.id_pendaftaran,
+                                    "point2",
+                                    Number(e.target.value)
+                                  )
+                                }
+                                className="border border-[#393E46] rounded px-2 py-1 w-full text-center focus:outline-none focus:ring-2 focus:ring-[#00ADB5]"
+                              />
+                            ) : (
+                              u.point2
+                            )}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   );
 }
