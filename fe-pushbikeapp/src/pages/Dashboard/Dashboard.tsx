@@ -48,12 +48,17 @@ export default function DashboardUser() {
 
           // cari winner sesi 2 berdasarkan finish terendah
           const sesi2All = semuaPeserta
-            .map(p => ({ peserta: p, finish: p.pointSesi?.find(s => s.sesi === 2)?.finish ?? Infinity }))
-            .filter(p => p.finish !== Infinity);
+            .map((p) => ({
+              peserta: p,
+              finish: p.pointSesi?.find((s) => s.sesi === 2)?.finish ?? Infinity,
+            }))
+            .filter((p) => p.finish !== Infinity);
 
           let winnerName = "Belum ada";
           if (sesi2All.length > 0) {
-            const winner = sesi2All.reduce((prev, curr) => (curr.finish < prev.finish ? curr : prev));
+            const winner = sesi2All.reduce((prev, curr) =>
+              curr.finish < prev.finish ? curr : prev
+            );
             winnerName = winner.peserta.nama;
           }
 
@@ -79,84 +84,96 @@ export default function DashboardUser() {
 
   // carousel otomatis tiap 3 detik
   useEffect(() => {
+    if (slides.length === 0) return;
     const interval = setInterval(() => {
-      setCarouselIndex(prev => (prev + 1) % slides.length);
-    }, 3000); // 3000ms = 3 detik
-
-    return () => clearInterval(interval); // bersihkan interval saat komponen unmount
+      setCarouselIndex((prev) => (prev + 1) % slides.length);
+    }, 3000);
+    return () => clearInterval(interval);
   }, [slides]);
 
   const nextSlide = () => setCarouselIndex((carouselIndex + 1) % slides.length);
   const prevSlide = () => setCarouselIndex((carouselIndex - 1 + slides.length) % slides.length);
 
   return (
-    <div className="min-h-screen bg-[#222831] p-6 max-w-7xl mx-auto font-poppins">
-      <h1 className="text-3xl font-bold text-[#EEEEEE] mb-6 text-center md:text-left">
+    <div className="min-h-screen bg-base-dark font-poppins px-6 py-12 max-w-7xl mx-auto">
+      {/* Header */}
+      <h1 className="text-3xl font-bold text-accent mb-6 text-center md:text-left">
         Selamat Datang di Push Bike Race! 🚴‍♂️
       </h1>
+      <p className="text-textlight/70 mb-10 text-center md:text-left">
+        Pilih lomba untuk melihat detail peserta & hasil.
+      </p>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        {/* Daftar lomba */}
         <div className="md:col-span-2 space-y-4">
-          <h2 className="text-xl font-semibold text-[#00ADB5] mb-2">
+          <h2 className="text-xl font-semibold text-accent mb-4">
             Lomba Yang Sedang Berjalan
           </h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
             {lombaCards.map((lomba) => (
               <div
                 key={lomba.id}
-                className="bg-[#393E46] text-[#EEEEEE] shadow rounded-lg p-4 hover:bg-[#00ADB5] hover:text-[#222831] transition cursor-pointer"
+                className="bg-[#00ADB5]/20 border border-[#00ADB5]/40 rounded-2xl p-6 shadow-md  text-textlight cursor-pointer hover:bg-accent hover:text-base-dark hover:shadow-accent/40 hover:scale-[1.03] transition-all duration-300"
               >
-                <h3 className="text-lg font-semibold">{lomba.name}</h3>
-                <p className="text-sm">Tanggal: {new Date(lomba.date).toLocaleDateString()}</p>
+                <h3 className="text-lg font-semibold mb-1">{lomba.name}</h3>
+                <p className="text-sm opacity-80">
+                  Tanggal: {new Date(lomba.date).toLocaleDateString()}
+                </p>
                 {lomba.kategori && (
-                  <p className="text-[#EEEEEE]/80 mt-1">
-                Kategori:{" "}
-                <span
-                  className={`font-semibold ${
-                    lomba.kategori === "boy" ? "text-blue-400" : lomba.kategori === "girl" ? "text-pink-400" : "text-[#00ADB5]"
-                  }`}
-                >
-                  {lomba.kategori}
-                </span>
-              </p>
-
+                  <p className="mt-1 text-sm">
+                    Kategori:{" "}
+                    <span
+                      className={`font-semibold ${
+                        lomba.kategori === "boy"
+                          ? "text-blue-400"
+                          : lomba.kategori === "girl"
+                          ? "text-pink-400"
+                          : "text-accent"
+                      }`}
+                    >
+                      {lomba.kategori}
+                    </span>
+                  </p>
                 )}
-                <p className="font-medium mt-2">Pemenang: {lomba.winner}</p>
+                <p className="mt-2 font-medium">Pemenang: {lomba.winner}</p>
               </div>
             ))}
           </div>
         </div>
 
+        {/* Carousel */}
         <div className="relative">
-  {slides.length > 0 && (
-    <div className="bg-[#393E46] text-[#EEEEEE] shadow rounded-lg overflow-hidden relative">
-      <img
-        src={slides[carouselIndex].image}
-        alt={slides[carouselIndex].name}
-        className="w-full h-36 object-cover"
-      />
-      <div className="p-4">
-        <h3 className="font-bold text-lg text-[#00ADB5]">{slides[carouselIndex].name}</h3>
-        <p className="text-sm">Pemenang: {slides[carouselIndex].winner}</p>
-      </div>
+          {slides.length > 0 && (
+            <div className="bg-[#00ADB5]/20 border border-[#00ADB5]/40 rounded-2xl shadow-md overflow-hidden relative">
+              <img
+                src={slides[carouselIndex].image}
+                alt={slides[carouselIndex].name}
+                className="w-full h-40 object-cover"
+              />
+              <div className="p-4">
+                <h3 className="font-bold text-lg text-accent">{slides[carouselIndex].name}</h3>
+                <p className="text-textlight/80 text-sm">
+                  Pemenang: {slides[carouselIndex].winner}
+                </p>
+              </div>
 
-      {/* Tombol navigasi kecil dan transparan */}
-      <button
-        onClick={prevSlide}
-        className="absolute top-1/2 left-2 -translate-y-1/2 bg-[#00ADB5]/70 text-[#222831] px-2 py-1 rounded-full shadow hover:bg-[#00ADB5]/90 transition text-sm"
-      >
-        ◀
-      </button>
-      <button
-        onClick={nextSlide}
-        className="absolute top-1/2 right-2 -translate-y-1/2 bg-[#00ADB5]/70 text-[#222831] px-2 py-1 rounded-full shadow hover:bg-[#00ADB5]/90 transition text-sm"
-      >
-        ▶
-      </button>
-    </div>
-  )}
-</div>
-
+              {/* Tombol navigasi */}
+              <button
+                onClick={prevSlide}
+                className="absolute top-1/2 left-3 -translate-y-1/2 bg-accent/80 text-base-dark px-2 py-1 rounded-full shadow hover:bg-accent transition text-sm"
+              >
+                ◀
+              </button>
+              <button
+                onClick={nextSlide}
+                className="absolute top-1/2 right-3 -translate-y-1/2 bg-accent/80 text-base-dark px-2 py-1 rounded-full shadow hover:bg-accent transition text-sm"
+              >
+                ▶
+              </button>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );

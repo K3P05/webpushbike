@@ -32,10 +32,10 @@ export default function AdminDashboard() {
 
   const menuItems: MenuItem[] = [
     { title: "➕ Tambah Lomba", desc: "Tambahkan lomba baru", action: () => setOpenModal(true) },
-    { title: "➕ Kelola Data Lomba", desc: "Pengelolaan data lomba yang sudah ada", path: "kelolalomba" },
+    { title: "📑 Kelola Data Lomba", desc: "Pengelolaan data lomba yang sudah ada", path: "kelolalomba" },
     { title: "👥 Daftar Peserta", desc: "Lihat dan kelola peserta", path: "daftarpeserta" },
     { title: "📋 Daftar Lomba", desc: `Semua lomba (${lombaCount})`, path: "daftarlomba" },
-    { title: "📩 Lihat Pesan", desc: `Semua Pesan Yang Masuk`, path: "lihatpesan" },
+    { title: "📩 Lihat Pesan", desc: `Semua pesan yang masuk`, path: "lihatpesan" },
     { title: "📊 Statistik", desc: "Statistik lomba & peserta", path: "statistik" },
   ];
 
@@ -43,7 +43,7 @@ export default function AdminDashboard() {
     <div className="min-h-screen bg-base-dark font-poppins">
       <div className="max-w-6xl mx-auto px-6 py-12">
         {/* Header */}
-        <h1 className="text-3xl font-bold mb-4 text-textlight">Dashboard Admin</h1>
+        <h1 className="text-3xl font-bold mb-4 text-accent">Dashboard Admin</h1>
         <p className="text-textlight/70 mb-10">
           Selamat datang, Admin! Silakan pilih menu untuk mengelola data.
         </p>
@@ -51,16 +51,17 @@ export default function AdminDashboard() {
         {/* Menu Cards */}
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
           {menuItems.map((item, idx) => (
-          <div
-            key={idx}
-            onClick={() => (item.action ? item.action() : item.path && navigate(item.path))}
-            className="bg-[#2E3440] shadow-md rounded-2xl p-8 cursor-pointer text-center hover:bg-[#00ADB5] hover:shadow-lg hover:scale-[1.02] transition-all group"
-          >
-            <h2 className="text-xl font-semibold mb-2 text-[#EEEEEE] group-hover:text-[#222831]">
-              {item.title}
-            </h2>
-            <p className="text-[#EEEEEE]/70 group-hover:text-[#222831]">{item.desc}</p>
-          </div>
+            <div
+              key={idx}
+              onClick={() => (item.action ? item.action() : item.path && navigate(item.path))}
+              className="bg-[#00ADB5]/20 border border-[#00ADB5]/40 shadow-md rounded-2xl p-8 cursor-pointer text-center hover:bg-accent hover:text-base-dark hover:shadow-accent/40 hover:scale-[1.03] transition-all duration-300 group">
+              <h2 className="text-xl font-semibold mb-2 text-textlight group-hover:text-base-dark">
+                {item.title}
+              </h2>
+              <p className="text-textlight/70 group-hover:text-base-dark">
+                {item.desc}
+              </p>
+            </div>
           ))}
         </div>
       </div>
