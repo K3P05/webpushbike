@@ -179,24 +179,27 @@ export default function OlahDataPeserta() {
   };
 
   const handleSimpan = async () => {
-    try {
-      for (let i = 0; i < batchPeserta.length; i++) {
-        const pesertaIds = batchPeserta[i].map(p => {
-          if (p.id_pendaftaran === 0) {
-            // kosong → kasih 100 supaya rank tinggi
-            return { id_pendaftaran: 0, point1: 100, point2: 100, penaltyPoint: 100 };
-          }
-          return { id_pendaftaran: p.id_pendaftaran, point1: p.point1, point2: p.point2, penaltyPoint: p.penaltyPoint ?? 0 };
-        });
+  try {
+    for (let i = 0; i < batchPeserta.length; i++) {
+      // Ambil hanya id peserta valid
+      const pesertaIds = batchPeserta[i]
+        .filter(p => p.id_pendaftaran !== 0)
+        .map(p => p.id_pendaftaran);
 
-        await api.post(`/lomba/${id}/peserta/batch`, { batch: i + 1, pesertaIds });
+      if (pesertaIds.length > 0) {
+        await api.post(`/lomba/${id}/peserta/batch`, {
+          batch: i + 1,
+          pesertaIds,
+        });
       }
-      alert("Semua batch berhasil disimpan!");
-    } catch (err: any) {
-      console.error(err.response?.data || err);
-      alert("Gagal menyimpan data batch!");
     }
-  };
+    alert("Semua batch berhasil disimpan!");
+  } catch (err: any) {
+    console.error(err.response?.data || err);
+    alert("Gagal menyimpan data batch!");
+  }
+};
+
 
   if (loading) return <p className="text-white">Loading...</p>;
   if (error) return <p className="text-red-400">{error}</p>;

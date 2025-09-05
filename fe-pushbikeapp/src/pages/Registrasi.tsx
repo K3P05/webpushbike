@@ -183,18 +183,12 @@ export default function Registrasi() {
               </div>
 
               <div className="mb-6">
-                <label className="block text-[#EEEEEE] font-medium">Metode Pembayaran</label>
-                <select
-                  name="metodePembayaran"
-                  value={formData.metodePembayaran}
-                  onChange={handleChange}
-                  className="w-full mt-1 p-2 bg-[#222831] text-[#EEEEEE] border border-[#00ADB5] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#00ADB5]"
-                >
-                  <option value="transfer">Transfer Bank</option>
-                  <option value="midtrans">Midtrans</option>
-                  <option value="cod">COD</option>
-                </select>
+                <p className="text-[#EEEEEE] font-medium">Metode Pembayaran</p>
+                <p className="text-[#00ADB5] mt-2 font-semibold">
+                  Transfer Bank: BCA 1234567890 a.n Panitia PushBike
+                </p>
               </div>
+
 
               <button
                 type="submit"

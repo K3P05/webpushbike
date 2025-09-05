@@ -18,6 +18,7 @@ import SesiLanjutanLomba from './pages/Lomba/SesiLanjutanLomba';
 import SesiLanjutanLomba2 from './pages/Lomba/SesiLanjutanLomba2';
 import LiveHasil from './pages/Hasil/LiveHasil';
 import LihatPesan from './pages/Peserta/LihatPesan';
+import CheckPeserta from './pages/Peserta/CheckPeserta';
 
 function App() {
   return (
@@ -43,6 +44,7 @@ function App() {
           <Route path="/admindashboard/kelolapeserta/:id" element={<KelolaPeserta />} />
           <Route path="/admindashboard/olahdatapeserta/:id" element={<OlahDataPeserta />} />
           <Route path="/admindashboard/lihatpesan" element={<LihatPesan />} />
+          <Route path="/admindashboard/checkpeserta" element={<CheckPeserta />} />
           <Route path="/sesilanjutanlomba/:id" element={<SesiLanjutanLomba />} />
           <Route path="/sesilanjutanlomba2/:id" element={<SesiLanjutanLomba2 />} />
           <Route path="/inputhasillomba/:moto/:id" element={<InputHasilLomba />} />
