@@ -1,16 +1,6 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import api from "@/services/api";
-
-type Peserta = {
-  id_pendaftaran: number;
-  nama: string;
-  kategori: string;
-  platNumber: string;
-  community: string;
-  id_lomba: number;
-  statusPembayaran: boolean;
-};
 
 type Lomba = {
   id: number;
@@ -22,8 +12,7 @@ type Lomba = {
 
 export default function CheckPeserta() {
   const [lombaList, setLombaList] = useState<Lomba[]>([]);
-  const [pesertaByLomba, setPesertaByLomba] = useState<Record<number, Peserta[]>>({});
-  const [expandedLomba, setExpandedLomba] = useState<number | null>(null);
+  const navigate = useNavigate();
 
   const fetchLomba = async () => {
     try {
@@ -31,27 +20,6 @@ export default function CheckPeserta() {
       setLombaList(res.data || []);
     } catch (err) {
       console.error("Gagal fetch lomba:", err);
-    }
-  };
-
-  const fetchPeserta = async (lombaId: number) => {
-    try {
-      const res = await api.get(`/lomba/${lombaId}/peserta`);
-      setPesertaByLomba((prev) => ({
-        ...prev,
-        [lombaId]: res.data || [],
-      }));
-    } catch (err) {
-      console.error("Gagal fetch peserta:", err);
-    }
-  };
-
-  const updateStatus = async (id: number, status: boolean, lombaId: number) => {
-    try {
-      await api.patch(`/peserta/${id}/status`, { statusPembayaran: status });
-      await fetchPeserta(lombaId); // refresh tabel peserta
-    } catch (err) {
-      console.error("Gagal update status:", err);
     }
   };
 
@@ -92,65 +60,11 @@ export default function CheckPeserta() {
             </div>
 
             <button
-              onClick={() => {
-                setExpandedLomba(expandedLomba === lomba.id ? null : lomba.id);
-                fetchPeserta(lomba.id);
-              }}
+              onClick={() => navigate(`/pesertalomba/${lomba.id}`)}
               className="mt-4 w-full bg-[#00ADB5] hover:bg-[#019ca4] text-[#EEEEEE] font-semibold px-4 py-2 rounded-lg shadow transition"
             >
-              {expandedLomba === lomba.id ? "Tutup Peserta" : "Cek Peserta"}
+              Cek Peserta
             </button>
-
-            {/* Tabel Peserta */}
-            {expandedLomba === lomba.id && (
-              <div className="mt-4 overflow-x-auto">
-                {pesertaByLomba[lomba.id] && pesertaByLomba[lomba.id].length > 0 ? (
-                  <table className="min-w-full border border-[#EEEEEE]/20 text-[#EEEEEE] text-sm rounded-lg">
-                    <thead className="bg-[#00ADB5] text-[#222831]">
-                      <tr>
-                        <th className="px-2 py-2 text-left">No</th>
-                        <th className="px-2 py-2 text-left">Nama</th>
-                        <th className="px-2 py-2 text-left">Plat</th>
-                        <th className="px-2 py-2 text-left">Community</th>
-                        <th className="px-2 py-2 text-left">Kategori</th>
-                        <th className="px-2 py-2 text-center">Status</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {pesertaByLomba[lomba.id].map((p, index) => (
-                        <tr
-                          key={p.id_pendaftaran}
-                          className="border-t border-[#EEEEEE]/20 hover:bg-[#00ADB5]/20"
-                        >
-                          <td className="px-2 py-2">{index + 1}</td>
-                          <td className="px-2 py-2">{p.nama}</td>
-                          <td className="px-2 py-2">{p.platNumber}</td>
-                          <td className="px-2 py-2">{p.community}</td>
-                          <td className="px-2 py-2">{p.kategori}</td>
-                          <td className="px-2 py-2 text-center">
-                            <input
-                              type="checkbox"
-                              className="w-6 h-6 accent-[#00ADB5]"
-                              checked={p.statusPembayaran}
-                              onChange={(e) =>
-                                updateStatus(p.id_pendaftaran, e.target.checked, lomba.id)
-                              }
-                            />
-                            <span className="ml-2">
-                              {p.statusPembayaran ? "Paid" : "Unpaid"}
-                            </span>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                ) : (
-                  <p className="text-[#EEEEEE]/70 text-sm mt-2">
-                    Belum ada peserta untuk lomba ini.
-                  </p>
-                )}
-              </div>
-            )}
           </div>
         ))}
       </div>

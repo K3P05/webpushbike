@@ -60,6 +60,7 @@ export class PesertaService {
     point2: p.point2,   // tambah point2
     batch: p.batch,
     pointSesi: p.pointSesi,
+    statusPembayaran: p.statusPembayaran,
   }));
 } 
 
