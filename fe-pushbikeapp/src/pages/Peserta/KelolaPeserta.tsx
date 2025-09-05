@@ -8,9 +8,10 @@ type Peserta = {
   id_pendaftaran: number;
   nama: string;
   kategori: string;
-  platNumber: string; // ✅ disesuaikan dengan DB
+  platNumber: string; 
   community: string;
   id_lomba: number;
+  statusPembayaran: boolean; // ✅ tambahkan
 };
 
 export default function KelolaPeserta() {
@@ -22,7 +23,10 @@ export default function KelolaPeserta() {
   const fetchPeserta = async () => {
     try {
       const res = await api.get(`/lomba/${id}/peserta`);
-      setPesertaList(res.data ?? []);
+      const semuaPeserta: Peserta[] = res.data ?? [];
+      // ✅ hanya ambil peserta yang sudah bayar
+      const pesertaLunas = semuaPeserta.filter((p) => p.statusPembayaran === true);
+      setPesertaList(pesertaLunas);
     } catch (err) {
       console.error("Gagal fetch peserta:", err);
     } finally {
@@ -51,7 +55,7 @@ export default function KelolaPeserta() {
       {loading ? (
         <p className="text-[#EEEEEE]/70">Loading data peserta...</p>
       ) : pesertaList.length === 0 ? (
-        <p className="text-[#EEEEEE]/70">Belum ada peserta untuk lomba ini.</p>
+        <p className="text-[#EEEEEE]/70">Belum ada peserta yang sudah membayar untuk lomba ini.</p>
       ) : (
         <div className="overflow-x-auto">
           {/* Table */}
