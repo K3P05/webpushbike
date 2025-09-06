@@ -27,8 +27,6 @@ export default function PertandinganLanjutan() {
   const [matchesUtama, setMatchesUtama] = useState<Peserta[][]>([]);
   const [matchesSekunder, setMatchesSekunder] = useState<Peserta[][]>([]);
   const [loading, setLoading] = useState(true);
-  const [showUtama, setShowUtama] = useState(false);
-  const [showSekunder, setShowSekunder] = useState(false);
   const [showPenalty, setShowPenalty] = useState(false);
 
   useEffect(() => {
@@ -138,7 +136,6 @@ export default function PertandinganLanjutan() {
     try {
       const pesertaList = [...matchesUtama.flat(), ...matchesSekunder.flat()];
 
-      // replace semua data finish di backend
       const dataToSend = pesertaList
         .filter(p => p.finish !== undefined && p.finish !== null)
         .map(p => ({
@@ -153,7 +150,8 @@ export default function PertandinganLanjutan() {
         return;
       }
 
-      await api.post(`/lomba/${lombaId}/peserta/pointsesi`, { data: dataToSend });
+      // gunakan endpoint yang sesuai controller
+      await api.post(`/lomba/${lombaId}/hasil`, { peserta: dataToSend });
 
       alert("Data finish berhasil disimpan dan diupdate!");
     } catch(err) {
@@ -216,31 +214,9 @@ export default function PertandinganLanjutan() {
     <div className="p-6 space-y-6">
       <h1 className="text-2xl font-bold text-white">Pertandingan Lanjutan - Lomba {lombaId}</h1>
 
-      <div className="flex space-x-4">
-        <button
-          onClick={() => setShowUtama(prev => !prev)}
-          className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg shadow-lg"
-        >
-          {showUtama ? "Sembunyikan Sesi Utama" : "Tampilkan Sesi Utama"}
-        </button>
-
-        <button
-          onClick={() => setShowSekunder(prev => !prev)}
-          className="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded-lg shadow-lg"
-        >
-          {showSekunder ? "Sembunyikan Sesi Sekunder" : "Tampilkan Sesi Sekunder"}
-        </button>
-
-        <button
-          onClick={() => setShowPenalty(prev => !prev)}
-          className="bg-red-600 hover:bg-red-700 text-white font-semibold py-2 px-4 rounded-lg shadow-lg"
-        >
-          {showPenalty ? "Sembunyikan Penalty" : "Tampilkan Penalty"}
-        </button>
-      </div>
-
-      {showUtama && matchesUtama.map((match, idx) => renderMatchTable(match, idx, "Utama"))}
-      {showSekunder && matchesSekunder.map((match, idx) => renderMatchTable(match, idx, "Sekunder"))}
+      {/* Render semua match tanpa tombol toggle */}
+      {matchesUtama.map((match, idx) => renderMatchTable(match, idx, "Utama"))}
+      {matchesSekunder.map((match, idx) => renderMatchTable(match, idx, "Sekunder"))}
 
       <div className="flex justify-center mt-6 space-x-4">
         <button

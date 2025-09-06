@@ -21,6 +21,9 @@ export class Peserta {
   @Column({ length: 100 })
   community: string;
 
+  @Column()
+  no_hp: string;
+
   @Column({ type: 'int', default: 0 })
   point1: number;
 

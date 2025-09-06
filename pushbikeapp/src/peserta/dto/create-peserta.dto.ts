@@ -14,8 +14,12 @@ export class CreatePesertaDto {
   @IsString() @IsNotEmpty()
   community: string;
 
+  @IsNotEmpty()
+  @IsString()
+  no_hp: string; 
+
   @IsEnum(Kategori)
-   kategori?: Kategori; 
+  kategori?: Kategori; 
 
   @IsEnum(['transfer','midtrans','cod'])
   metodePembayaran: 'transfer' | 'midtrans' | 'cod';

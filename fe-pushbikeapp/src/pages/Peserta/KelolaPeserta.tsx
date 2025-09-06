@@ -97,6 +97,18 @@ export default function KelolaPeserta() {
               </button>
             </div>
           )}
+          {/* Button Acak Peserta */}
+          {!loading && pesertaList.length > 0 && (
+            <div className="mt-4 flex justify-end gap-4">
+              <button
+                onClick={() => navigate(`/admindashboard/acakpeserta/${id}`)}
+                className="px-6 py-2 bg-green-500 text-[#222831] font-medium rounded-lg hover:bg-green-600 transition"
+              >
+                Acak Peserta
+              </button>
+            </div>
+          )}
+
         </div>
       )}
     </div>

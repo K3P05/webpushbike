@@ -23,6 +23,7 @@ export default function Registrasi() {
     nama: "",
     plat_number: "",
     community: "",
+    no_hp : "",
     metodePembayaran: "transfer",
   });
 
@@ -47,19 +48,31 @@ export default function Registrasi() {
     e.preventDefault();
     if (!selectedLomba) return;
 
+    const confirmDaftar = window.confirm(
+      `Apakah Anda yakin ingin mendaftar ke lomba "${selectedLomba.nama}"?`
+    );
+    if (!confirmDaftar) return;
+
     try {
       await api.post(`/lomba/${selectedLomba.id}/peserta`, {
-        ...formData,
+        nama: formData.nama,
+        plat_number: formData.plat_number,
+        community: formData.community,
+        no_hp: formData.no_hp,
+        metodePembayaran: formData.metodePembayaran,
         kategori: selectedLomba.kategori,
       });
 
+      alert(`✅ Pendaftaran berhasil! Anda telah terdaftar di lomba "${selectedLomba.nama}".`);
+
       await fetchLomba();
       setSelectedLomba(null);
-      setFormData({ nama: "", plat_number: "", community: "", metodePembayaran: "transfer" });
+      setFormData({ nama: "", plat_number: "", community: "", no_hp: "", metodePembayaran: "transfer" });
+
       navigate("/");
     } catch (err: any) {
       console.error(err);
-      alert(err?.response?.data?.message || "Gagal daftar");
+      alert(err?.response?.data?.message || "❌ Gagal daftar");
     }
   };
 
@@ -183,13 +196,25 @@ export default function Registrasi() {
                 />
               </div>
 
+              <div className="mb-4">
+              <label className="block text-[#EEEEEE] font-medium">No HP</label>
+              <input
+                type="text"
+                name="no_hp"
+                value={formData.no_hp || ""}
+                onChange={handleChange}
+                className="w-full mt-1 p-2 bg-[#222831] text-[#EEEEEE] border border-[#00ADB5] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#00ADB5]"
+                required
+              />
+            </div>
+
+
               <div className="mb-6">
                 <p className="text-[#EEEEEE] font-medium">Metode Pembayaran</p>
                 <p className="text-[#00ADB5] mt-2 font-semibold">
                   Transfer Bank: BCA 1234567890 a.n Panitia PushBike
                 </p>
               </div>
-
 
               <button
                 type="submit"

@@ -19,4 +19,7 @@ export class PointSesi {
   @Column({ type: 'int', default: 0 })
   point?: number; // bisa dihitung dari finish
 
+  @Column({ name: 'penalty_point', type: 'int', default: 0 })
+  penaltyPoint: number;
+
 }

@@ -12,7 +12,6 @@ interface Peserta {
   batch?: number;
   point1?: number;
   point2?: number;
-  penaltyPoint?: number; // tambahan
   totalPoint?: number;
   rank?: number;
   gate1?: number;
@@ -38,7 +37,6 @@ export default function OlahDataPeserta() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [jumlahBatch, setJumlahBatch] = useState<number>(1);
-  const [showPenalty, setShowPenalty] = useState(false); // toggle penalty
 
   useEffect(() => {
     const fetchPeserta = async () => {
@@ -60,9 +58,8 @@ export default function OlahDataPeserta() {
           id_lomba: p.lomba?.id ?? p.id_lomba,
           point1: p.point1 ?? 0,
           point2: p.point2 ?? 0,
-          penaltyPoint: p.penaltyPoint ?? 0,
           batch: p.batch,
-          totalPoint: (p.point1 ?? 0) + (p.point2 ?? 0) + (p.penaltyPoint ?? 0),
+          totalPoint: (p.point1 ?? 0) + (p.point2 ?? 0),
         }));
 
         setPeserta(data);
@@ -82,7 +79,6 @@ export default function OlahDataPeserta() {
             batch: idx + 1,
             point1: 0,
             point2: 0,
-            penaltyPoint: 0,
             totalPoint: 0,
           }))
         );
@@ -131,7 +127,7 @@ export default function OlahDataPeserta() {
 
     const withTotal = withGate.map((p) => ({
       ...p,
-      totalPoint: (p.point1 ?? 0) + (p.point2 ?? 0) + (p.penaltyPoint ?? 0),
+      totalPoint: (p.point1 ?? 0) + (p.point2 ?? 0),
     }));
 
     const sorted = [...withTotal].sort((a, b) => a.totalPoint! - b.totalPoint!);
@@ -157,8 +153,7 @@ export default function OlahDataPeserta() {
         community: found ? found.community : "",
         point1: found ? found.point1 ?? 0 : 0,
         point2: found ? found.point2 ?? 0 : 0,
-        penaltyPoint: found ? found.penaltyPoint ?? 0 : 0,
-        totalPoint: found ? (found.point1 ?? 0) + (found.point2 ?? 0) + (found.penaltyPoint ?? 0) : 0,
+        totalPoint: found ? (found.point1 ?? 0) + (found.point2 ?? 0) : 0,
       };
 
       updated[batchIdx] = batch;
@@ -166,40 +161,27 @@ export default function OlahDataPeserta() {
     });
   };
 
-  const handlePenaltyChange = (batchIdx: number, localIdx: number, value: number) => {
-    setBatchPeserta((prev) => {
-      const updated = [...prev];
-      updated[batchIdx][localIdx].penaltyPoint = value;
-      updated[batchIdx][localIdx].totalPoint =
-        (updated[batchIdx][localIdx].point1 ?? 0) +
-        (updated[batchIdx][localIdx].point2 ?? 0) +
-        value;
-      return updated;
-    });
-  };
-
   const handleSimpan = async () => {
-  try {
-    for (let i = 0; i < batchPeserta.length; i++) {
-      // Ambil hanya id peserta valid
-      const pesertaIds = batchPeserta[i]
-        .filter(p => p.id_pendaftaran !== 0)
-        .map(p => p.id_pendaftaran);
+    try {
+      for (let i = 0; i < batchPeserta.length; i++) {
+        // Ambil hanya id peserta valid
+        const pesertaIds = batchPeserta[i]
+          .filter(p => p.id_pendaftaran !== 0)
+          .map(p => p.id_pendaftaran);
 
-      if (pesertaIds.length > 0) {
-        await api.post(`/lomba/${id}/peserta/batch`, {
-          batch: i + 1,
-          pesertaIds,
-        });
+        if (pesertaIds.length > 0) {
+          await api.post(`/lomba/${id}/peserta/batch`, {
+            batch: i + 1,
+            pesertaIds,
+          });
+        }
       }
+      alert("Semua batch berhasil disimpan!");
+    } catch (err: any) {
+      console.error(err.response?.data || err);
+      alert("Gagal menyimpan data batch!");
     }
-    alert("Semua batch berhasil disimpan!");
-  } catch (err: any) {
-    console.error(err.response?.data || err);
-    alert("Gagal menyimpan data batch!");
-  }
-};
-
+  };
 
   if (loading) return <p className="text-white">Loading...</p>;
   if (error) return <p className="text-red-400">{error}</p>;
@@ -223,7 +205,6 @@ export default function OlahDataPeserta() {
                   <th className="border p-2">Community</th>
                   <th className="border p-2">Point1</th>
                   <th className="border p-2">Point2</th>
-                  {showPenalty && <th className="border p-2">Penalty</th>}
                   <th className="border p-2">Total Point</th>
                   <th className="border p-2">Rank</th>
                 </tr>
@@ -245,16 +226,6 @@ export default function OlahDataPeserta() {
                     <td className="border p-2">{p.community}</td>
                     <td className="border p-2">{p.point1}</td>
                     <td className="border p-2">{p.point2}</td>
-                    {showPenalty && (
-                      <td className="border p-2">
-                        <input
-                          type="number"
-                          value={p.penaltyPoint ?? 0}
-                          onChange={(e) => handlePenaltyChange(i, idx, Number(e.target.value))}
-                          className="bg-gray-700 text-white p-1 rounded w-full"
-                        />
-                      </td>
-                    )}
                     <td className="border p-2">{p.totalPoint}</td>
                     <td className="border p-2">{p.rank}</td>
                   </tr>
@@ -271,12 +242,6 @@ export default function OlahDataPeserta() {
           className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg shadow-lg"
         >
           Simpan Data Batch
-        </button>
-        <button
-          onClick={() => setShowPenalty(!showPenalty)}
-          className="bg-yellow-600 hover:bg-yellow-700 text-white font-semibold py-2 px-4 rounded-lg shadow-lg"
-        >
-          {showPenalty ? "Sembunyikan Penalty" : "Penalty Point"}
         </button>
         <button
           onClick={() => navigate(`/inputhasillomba/moto1/${id}`)}

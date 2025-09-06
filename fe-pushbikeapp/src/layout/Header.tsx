@@ -31,27 +31,31 @@ export default function Header() {
         {/* Navbar Desktop */}
         {!isLoginPage && (
           <nav className="hidden md:flex">
-            <ul className="flex space-x-8 text-textlight font-medium items-center">
-              {navItems.map((item) => {
-                const active = location.pathname === item.path;
-                return (
-                  <li key={item.path} className="relative">
-                    <Link
-                      to={item.path}
-                      className={`pb-1 transition-all duration-300 ${
-                        active
-                          ? "text-accent"
-                          : "text-textlight hover:text-accent/80"
-                      }`}
-                    >
-                      {item.label}
-                    </Link>
-                    {active && (
-                      <span className="absolute -bottom-[2px] left-0 w-full h-[2px] bg-[#00ADB5] shadow-[0_0_8px_rgba(0,173,181,0.8)] animate-pulse"></span>
-                    )}
-                  </li>
-                );
-              })}
+            <ul className="flex space-x-6 text-[#EEEEEE] font-medium items-center">
+              <li>
+                <Link
+                  to="/registrasi"
+                  className="hover:text-[#00ADB5] transition"
+                >
+                  Registrasi
+                </Link>
+              </li>
+              <li>
+                <Link
+                  to="/listhasil"
+                  className="hover:text-[#00ADB5] transition"
+                >
+                  Hasil Live
+                </Link>
+              </li>
+              <li>
+                <Link
+                  to="/kontak"
+                  className="hover:text-[#00ADB5] transition"
+                >
+                  Kontak
+                </Link>
+              </li>
               <li>
                 <Link
                   to="/loginadmin"
@@ -78,30 +82,35 @@ export default function Header() {
 
       {/* Navbar Mobile */}
       {menuOpen && !isLoginPage && (
-        <nav className="md:hidden bg-base-dark border-t border-card-dark shadow-lg transition-all duration-300">
-          <ul className="flex flex-col space-y-4 p-6 text-textlight font-medium">
-            {navItems.map((item) => {
-              const active = location.pathname === item.path;
-              return (
-                <li key={item.path} className="relative">
-                  <Link
-                    to={item.path}
-                    onClick={toggleMenu}
-                    className={`block transition-all duration-300 ${
-                      active
-                        ? "text-accent"
-                        : "text-textlight hover:text-accent/80"
-                    }`}
-                  >
-                    {item.label}
-                  </Link>
-                  {/* dot accent indicator for mobile */}
-                  {active && (
-                    <span className="absolute -right-4 top-1/2 -translate-y-1/2 w-2 h-2 rounded-full bg-[#00ADB5] shadow-[0_0_8px_rgba(0,173,181,0.8)] animate-pulse]"></span>
-                  )}
-                </li>
-              );
-            })}
+        <nav className="md:hidden bg-[#222831] border-t border-[#393E46] shadow-md">
+          <ul className="flex flex-col space-y-4 p-6 text-[#EEEEEE] font-medium">
+            <li>
+              <Link
+                to="/registrasi"
+                onClick={toggleMenu}
+                className="hover:text-[#00ADB5] transition"
+              >
+                Registrasi
+              </Link>
+            </li>
+            <li>
+              <Link
+                to="/listhasil"
+                onClick={toggleMenu}
+                className="hover:text-[#00ADB5] transition"
+              >
+                Hasil Live
+              </Link>
+            </li>
+            <li>
+              <Link
+                to="/kontak"
+                onClick={toggleMenu}
+                className="hover:text-[#00ADB5] transition"
+              >
+                Kontak
+              </Link>
+            </li>
             <li>
               <Link
                 to="/loginadmin"
