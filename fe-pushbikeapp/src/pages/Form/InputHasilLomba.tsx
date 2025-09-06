@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import api from "@/services/api";
 
 interface Peserta {
@@ -12,6 +12,7 @@ interface Peserta {
   point1?: number;
   point2?: number;
   batch?: number;
+  penaltyPoint?: number; // kolom penalty dari DB
 }
 
 interface RowInput {
@@ -20,13 +21,16 @@ interface RowInput {
   community: string;
   point: number; 
   finish: number;
+  penalty: number; // kolom penalty
 }
 
 export default function InputHasilLomba() {
   const { id, moto } = useParams<{ id: string; moto: string }>();
+  const navigate = useNavigate();
   const [pesertaDb, setPesertaDb] = useState<Peserta[]>([]);
   const [batchData, setBatchData] = useState<RowInput[][]>([]);
   const [loading, setLoading] = useState(true);
+  const [showPenalty, setShowPenalty] = useState(false);
 
   useEffect(() => {
     const fetchPeserta = async () => {
@@ -36,7 +40,7 @@ export default function InputHasilLomba() {
         setPesertaDb(data);
 
         const batchesMap: Record<number, RowInput[]> = {};
-        data.forEach((p: any) => {
+        data.forEach((p) => {
           const pointValue = moto === "moto1" ? p.point1 ?? 0 : p.point2 ?? 0;
           const batchNum = p.batch || 1;
           if (!batchesMap[batchNum]) batchesMap[batchNum] = [];
@@ -47,6 +51,7 @@ export default function InputHasilLomba() {
             community: pointValue > 0 ? p.community : "",
             point: pointValue,
             finish: 0,
+            penalty: p.penaltyPoint ?? 0, // isi langsung dari DB kalau ada
           });
         });
 
@@ -57,7 +62,7 @@ export default function InputHasilLomba() {
             const withPoint = batch.filter((p) => p.point > 0);
             const noPoint = batch.filter((p) => p.point === 0);
 
-            withPoint.sort((a, b) => a.point - b.point); // ascending point
+            withPoint.sort((a, b) => a.point - b.point);
             const combined = [...withPoint, ...noPoint];
             combined.forEach((p, idx) => (p.finish = idx + 1));
             return combined;
@@ -87,6 +92,7 @@ export default function InputHasilLomba() {
         nama: found?.nama || "",
         community: found?.community || "",
         point: found ? 1 : 0,
+        penalty: found?.penaltyPoint ?? 0,
       };
 
       const withPoint = rows.filter((r) => r.point > 0);
@@ -100,21 +106,31 @@ export default function InputHasilLomba() {
     });
   };
 
+  const handlePenaltyChange = (batchIndex: number, rowIndex: number, value: number) => {
+    setBatchData((prev) => {
+      const updated = [...prev];
+      const rows = [...updated[batchIndex]];
+      rows[rowIndex] = { ...rows[rowIndex], penalty: value };
+      updated[batchIndex] = rows;
+      return updated;
+    });
+  };
+
   const handleSimpan = async () => {
     if (!id || !moto) return console.error("ID lomba atau moto tidak ditemukan!");
     try {
-      const pesertaWithPoints = batchData.flatMap((batch) =>
-        batch
-          .filter((r) => r.platNumber)
-          .map((r) => {
-            const pesertaDbItem = pesertaDb.find((p) => p.platNumber === r.platNumber);
-            return {
-              id: pesertaDbItem?.id_pendaftaran,
-              [`point${moto === "moto1" ? "1" : "2"}`]: r.finish,
-            };
-          })
-      );
-
+    const pesertaWithPoints = batchData.flatMap((batch) =>
+  batch
+    .filter((r) => r.platNumber)
+    .map((r) => {
+      const pesertaDbItem = pesertaDb.find((p) => p.platNumber === r.platNumber);
+      return {
+        id: pesertaDbItem?.id_pendaftaran,
+        [`point${moto === "moto1" ? "1" : "2"}`]: r.finish + r.penalty,
+        penaltyPoint: r.penalty,
+      };
+    })
+);
       await api.post(`/lomba/${id}/hasil`, {
         moto,
         peserta: pesertaWithPoints,
@@ -128,7 +144,9 @@ export default function InputHasilLomba() {
 
   return (
     <div className="p-4 md:p-6 space-y-6">
-      <h1 className="text-2xl md:text-3xl font-bold text-white">Input Hasil Lomba {moto?.toUpperCase()} - Lomba {id}</h1>
+      <h1 className="text-2xl md:text-3xl font-bold text-white">
+        Input Hasil Lomba {moto?.toUpperCase()} - Lomba {id}
+      </h1>
 
       {batchData.map((rows, b) => {
         const pesertaBatchDb = pesertaDb.filter((p) => p.batch === b + 1);
@@ -137,7 +155,9 @@ export default function InputHasilLomba() {
           <div key={b} className="mb-8 grid grid-cols-1 md:grid-cols-2 gap-4">
             {/* Tabel input */}
             <div className="overflow-x-auto bg-gray-800 p-2 rounded-lg">
-              <h2 className="text-lg md:text-xl font-semibold text-yellow-400 mb-2">Batch {b + 1} - Input</h2>
+              <h2 className="text-lg md:text-xl font-semibold text-yellow-400 mb-2">
+                Batch {b + 1} - Input
+              </h2>
               <table className="min-w-[400px] w-full border-collapse border border-gray-500 text-sm md:text-base">
                 <thead>
                   <tr>
@@ -145,6 +165,7 @@ export default function InputHasilLomba() {
                     <th className="border p-2 min-w-[150px]">Nama Rider</th>
                     <th className="border p-2 min-w-[120px]">Community</th>
                     <th className="border p-2 w-16">Finish</th>
+                    {showPenalty && <th className="border p-2 w-20">Penalty</th>}
                   </tr>
                 </thead>
                 <tbody>
@@ -161,6 +182,17 @@ export default function InputHasilLomba() {
                       <td className="border p-2 text-white">{row.nama}</td>
                       <td className="border p-2 text-white">{row.community}</td>
                       <td className="border p-2 text-white text-center">{row.finish}</td>
+                      {showPenalty && (
+                        <td className="border p-2">
+                          <input
+                            type="number"
+                            min={0}
+                            value={row.penalty}
+                            onChange={(e) => handlePenaltyChange(b, i, Number(e.target.value))}
+                            className="bg-gray-700 text-white p-1 rounded w-full text-center"
+                          />
+                        </td>
+                      )}
                     </tr>
                   ))}
                 </tbody>
@@ -169,7 +201,9 @@ export default function InputHasilLomba() {
 
             {/* Tabel referensi */}
             <div className="overflow-x-auto bg-gray-800 p-2 rounded-lg">
-              <h2 className="text-lg md:text-xl font-semibold text-green-400 mb-2">Batch {b + 1} - Peserta (DB)</h2>
+              <h2 className="text-lg md:text-xl font-semibold text-green-400 mb-2">
+                Batch {b + 1} - Peserta (DB)
+              </h2>
               <table className="min-w-[120px] w-full border-collapse border border-gray-500 text-sm md:text-base">
                 <thead>
                   <tr>
@@ -191,10 +225,24 @@ export default function InputHasilLomba() {
 
       <div className="flex flex-wrap justify-center gap-4 mt-4">
         <button
+          onClick={() => setShowPenalty((prev) => !prev)}
+          className="bg-yellow-600 hover:bg-yellow-700 text-white font-semibold py-2 px-4 rounded-lg shadow-lg"
+        >
+          {showPenalty ? "Sembunyikan Penalty" : "Tampilkan Penalty"}
+        </button>
+
+        <button
           onClick={handleSimpan}
           className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg shadow-lg"
         >
           Simpan Hasil
+        </button>
+
+        <button
+          onClick={() => navigate(`/admindashboard/olahdatapeserta/${id}`)}
+          className="bg-gray-600 hover:bg-gray-700 text-white font-semibold py-2 px-4 rounded-lg shadow-lg"
+        >
+          Kembali
         </button>
       </div>
     </div>

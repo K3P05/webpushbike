@@ -36,7 +36,7 @@ export default function Header() {
               </li>
               <li>
                 <Link
-                  to="/resultlist"
+                  to="/listhasil"
                   className="hover:text-[#00ADB5] transition"
                 >
                   Hasil Live
@@ -88,7 +88,7 @@ export default function Header() {
             </li>
             <li>
               <Link
-                to="/resultlist"
+                to="/listhasil"
                 onClick={toggleMenu}
                 className="hover:text-[#00ADB5] transition"
               >

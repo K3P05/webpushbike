@@ -14,14 +14,42 @@ type LombaType = {
   kategori: Kategori;
 };
 
-export default function ResultList() {
+type PesertaType = {
+  id_pendaftaran: number;
+  point1: number;
+  point2: number;
+};
+
+export default function ListHasil() {
   const navigate = useNavigate();
   const [lombaList, setLombaList] = useState<LombaType[]>([]);
+  const [lombaStatus, setLombaStatus] = useState<Record<number, boolean>>({}); 
+  // record lombaId => true if can click
 
   const fetchLomba = async () => {
     try {
       const res = await api.get<LombaType[]>("/lomba");
       setLombaList(res.data || []);
+
+      // Cek peserta per lomba
+      const status: Record<number, boolean> = {};
+      await Promise.all(
+        (res.data || []).map(async (lomba) => {
+          try {
+            const pesertaRes = await api.get<PesertaType[]>(`/lomba/${lomba.id}/peserta`);
+            const canClick = pesertaRes.data.some(
+              (p) => (p.point1 || 0) > 0 || (p.point2 || 0) > 0
+            );
+            status[lomba.id] = canClick;
+          } catch (err) {
+            console.error("Gagal fetch peserta:", err);
+            status[lomba.id] = false;
+          }
+        })
+      );
+
+      setLombaStatus(status);
+
     } catch (err) {
       console.error("Gagal fetch lomba:", err);
     }
@@ -68,10 +96,16 @@ export default function ResultList() {
 
             <button
               onClick={() => navigate(`/livehasil/${lomba.id}`)}
-              className="mt-4 w-full bg-[#00ADB5] hover:bg-[#019ca4] text-[#EEEEEE] font-semibold px-4 py-2 rounded-lg shadow transition"
+              disabled={!lombaStatus[lomba.id]} // disable jika tidak ada poin
+              className={`mt-4 w-full text-[#EEEEEE] font-semibold px-4 py-2 rounded-lg shadow transition ${
+                lombaStatus[lomba.id]
+                  ? "bg-[#00ADB5] hover:bg-[#019ca4]"
+                  : "bg-gray-500 cursor-not-allowed"
+              }`}
             >
-              Lihat Hasil
+              {lombaStatus[lomba.id] ? "Lihat Hasil" : "Lomba Belum Berjalan"}
             </button>
+
           </div>
         ))}
       </div>

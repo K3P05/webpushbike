@@ -172,7 +172,7 @@ export default function PertandinganLanjutan2() {
     if (pesertaList.length === 0) return alert("Tidak ada data finish diisi");
 
     // POST untuk replace semua finish sesi 2
-    await api.post(`/lomba/${lombaId}/peserta/pointsesi/replace`, { data: pesertaList });
+    await api.post(`/lomba/${lombaId}/peserta/pointsesi`, { data: pesertaList });
 
     alert("Data finish berhasil disimpan dan diupdate");
   } catch (err) {
