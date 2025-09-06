@@ -146,40 +146,51 @@ export default function Registrasi() {
               </span>
             </p>
 
-            {/* Form */}
-            <form onSubmit={handleSubmit} className="space-y-4">
-              {["nama", "plat_number", "community"].map((field) => (
-                <div key={field}>
-                  <label className="block text-textlight font-medium capitalize">
-                    {field.replace("_", " ")}
-                  </label>
-                    <input
-                      type="text"
-                      name={field}
-                      value={(formData as any)[field]}
-                      onChange={handleChange}
-                      className="w-full mt-1 p-2 bg-base-dark text-slate-600 placeholder-textlight/60 border border-accent/40 rounded-lg focus:outline-none focus:border-accent transition"
-                      placeholder={`Masukkan ${field.replace("_", " ")}`}
-                      required
-                    />
-                </div>
-              ))}
-
-              <div>
-                <label className="block text-textlight font-medium">Metode Pembayaran</label>
-                <select
-                  name="metodePembayaran"
-                  value={formData.metodePembayaran}
+            <form onSubmit={handleSubmit}>
+              <div className="mb-4">
+                <label className="block text-[#EEEEEE] font-medium">Nama</label>
+                <input
+                  type="text"
+                  name="nama"
+                  value={formData.nama}
                   onChange={handleChange}
-                  className="w-full mt-1 p-2 bg-base-dark text-slate-600 border border-accent/40 rounded-lg focus:outline-none focus:border-accent transition"
-                >
-                  <option value="transfer">Transfer Bank</option>
-                  <option value="midtrans">Midtrans</option>
-                  <option value="cod">COD</option>
-                </select>
+                  className="w-full mt-1 p-2 bg-[#222831] text-[#EEEEEE] border border-[#00ADB5] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#00ADB5]"
+                  required
+                />
               </div>
 
-              {/* Submit */}
+              <div className="mb-4">
+                <label className="block text-[#EEEEEE] font-medium">Plat Number</label>
+                <input
+                  type="text"
+                  name="plat_number"
+                  value={formData.plat_number}
+                  onChange={handleChange}
+                  className="w-full mt-1 p-2 bg-[#222831] text-[#EEEEEE] border border-[#00ADB5] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#00ADB5]"
+                  required
+                />
+              </div>
+
+              <div className="mb-4">
+                <label className="block text-[#EEEEEE] font-medium">Community</label>
+                <input
+                  type="text"
+                  name="community"
+                  value={formData.community}
+                  onChange={handleChange}
+                  className="w-full mt-1 p-2 bg-[#222831] text-[#EEEEEE] border border-[#00ADB5] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#00ADB5]"
+                  required
+                />
+              </div>
+
+              <div className="mb-6">
+                <p className="text-[#EEEEEE] font-medium">Metode Pembayaran</p>
+                <p className="text-[#00ADB5] mt-2 font-semibold">
+                  Transfer Bank: BCA 1234567890 a.n Panitia PushBike
+                </p>
+              </div>
+
+
               <button
                 type="submit"
                 className="w-full bg-accent hover:bg-[#00cfd8] text-base-dark font-semibold p-3 rounded-lg shadow-md hover:shadow-accent/40 transition-all"

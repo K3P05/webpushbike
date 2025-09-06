@@ -27,6 +27,9 @@ export class Peserta {
   @Column({ type: 'int', default: 0 })
   point2: number;
 
+  @Column({ nullable: true, default: 0 })
+  penaltyPoint: number;
+
   @OneToMany(() => PointSesi, pointSesi => pointSesi.peserta, { cascade: true })
   pointsesi: PointSesi[];
 
@@ -39,10 +42,17 @@ export class Peserta {
   @Column({ type: 'enum', enum: ['transfer','midtrans','cod'], default: 'transfer' })
   metode_pembayaran: string;
 
+  @Column({ type: 'boolean', default: false })
+  statusPembayaran: boolean;
+
   @ManyToOne(() => Lomba, (lomba) => lomba.peserta, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'lomba_id' })
   lomba: Lomba;
 
+  @Column({ type: 'int' })
+  lomba_id: number; 
+
   @OneToMany(() => PointSesi, (pointSesi) => pointSesi.peserta, { cascade: true })
   pointSesi: PointSesi[];
+
 }

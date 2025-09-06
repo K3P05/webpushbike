@@ -35,7 +35,8 @@ export default function AdminDashboard() {
     { title: "📑 Kelola Data Lomba", desc: "Pengelolaan data lomba yang sudah ada", path: "kelolalomba" },
     { title: "👥 Daftar Peserta", desc: "Lihat dan kelola peserta", path: "daftarpeserta" },
     { title: "📋 Daftar Lomba", desc: `Semua lomba (${lombaCount})`, path: "daftarlomba" },
-    { title: "📩 Lihat Pesan", desc: `Semua pesan yang masuk`, path: "lihatpesan" },
+    { title: "📩 Lihat Pesan", desc: `Semua Pesan Yang Masuk`, path: "lihatpesan" },
+    { title: "☑️ Status Peserta", desc: "Status Pembayaran peserta", path: "checkpeserta" },
     { title: "📊 Statistik", desc: "Statistik lomba & peserta", path: "statistik" },
   ];
 

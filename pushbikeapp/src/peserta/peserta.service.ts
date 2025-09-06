@@ -8,6 +8,7 @@ import { Lomba } from '../lomba/entities/lomba.entity';
 import { UpdateBatchDto } from './dto/update-peserta.dto';
 import { PointSesi } from './entities/point_sesi.entity';
 import { UpdatePointSesiDto } from './dto/update-point-sesi.dto';
+import { UpdateStatusPembayaranDto } from './dto/update-status-pembayaran.dto';
 
 @Injectable()
 export class PesertaService {
@@ -59,24 +60,34 @@ export class PesertaService {
     point2: p.point2,   // tambah point2
     batch: p.batch,
     pointSesi: p.pointSesi,
+    statusPembayaran: p.statusPembayaran,
   }));
 } 
 
 async updateBatch(lombaId: number, dto: UpdateBatchDto) {
-    const { batch, pesertaIds } = dto;
+  const { batch, pesertaIds } = dto;
 
-    // pastikan lomba ada
-    const lomba = await this.lombaRepo.findOne({ where: { id: lombaId } });
-    if (!lomba) throw new BadRequestException('Lomba tidak ditemukan');
-
-    // update batch untuk peserta terpilih
-    await this.pesertaRepo.update(
-      { id_pendaftaran: In(pesertaIds), lomba: { id: lombaId } },
-      { batch },
-    );
-
-    return { message: 'Batch berhasil disimpan', batch, pesertaIds };
+  if (!pesertaIds || pesertaIds.length === 0) {
+    throw new BadRequestException('Tidak ada peserta yang dikirim');
   }
+
+  const lomba = await this.lombaRepo.findOne({ where: { id: lombaId } });
+  if (!lomba) throw new BadRequestException('Lomba tidak ditemukan');
+
+  const result = await this.pesertaRepo.update(
+    { id_pendaftaran: In(pesertaIds), lomba: { id: lombaId } },
+    { batch },
+  );
+
+  return {
+    message: 'Batch berhasil disimpan',
+    batch,
+    pesertaIds,
+    affected: result.affected,
+  };
+}
+
+
   
   // src/peserta/peserta.service.ts
 async updatePointSesiBulk(lombaId: number, data: UpdatePointSesiDto[]) {
@@ -101,6 +112,26 @@ async updatePointSesiBulk(lombaId: number, data: UpdatePointSesiDto[]) {
   return { message: "Finish berhasil disimpan", count: data.length };
 }
 
+async updateStatusPembayaran(
+  lombaId: number,
+  pesertaId: number,
+  dto: UpdateStatusPembayaranDto,
+) {
+  const peserta = await this.pesertaRepo.findOne({
+    where: { id_pendaftaran: pesertaId, lomba: { id: lombaId } },
+  });
+
+  if (!peserta) throw new BadRequestException('Peserta tidak ditemukan');
+
+  peserta.statusPembayaran = dto.statusPembayaran;
+  await this.pesertaRepo.save(peserta);
+
+  return {
+    message: 'Status pembayaran berhasil diperbarui',
+    pesertaId,
+    statusPembayaran: dto.statusPembayaran,
+  };
+}
 
 
 }

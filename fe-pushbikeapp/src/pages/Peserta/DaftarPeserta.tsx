@@ -9,6 +9,7 @@ type Peserta = {
   platNumber: string;
   community: string;
   id_lomba: number;
+  statusPembayaran: boolean;  // 👈 tambahkan
 };
 
 type Lomba = {
@@ -33,10 +34,15 @@ export default function DaftarPeserta() {
 
       // Ambil peserta per lomba
       const grouped: Record<number, Peserta[]> = {};
+     // fetchData di DaftarPeserta.tsx
       for (const lomba of lombaData) {
         const pesertaRes = await api.get(`/lomba/${lomba.id}/peserta`);
-        grouped[lomba.id] = pesertaRes.data ?? [];
+        const pesertaData = pesertaRes.data ?? [];
+
+        // 🔥 hanya ambil yang sudah bayar
+        grouped[lomba.id] = pesertaData.filter((p: Peserta & { statusPembayaran: boolean }) => p.statusPembayaran);
       }
+
 
       setPesertaByLomba(grouped);
     } catch (err) {
