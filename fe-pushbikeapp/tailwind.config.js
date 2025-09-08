@@ -1,4 +1,4 @@
-/** @type {import('tailwindcss').Config} */
+// tailwind.config.js
 export default {
   content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
   theme: {
@@ -6,25 +6,20 @@ export default {
       fontFamily: {
         poppins: ["Poppins", "sans-serif"],
       },
-      theme: {
-        extend: {
-          colors: {
-            base: {
-              DEFAULT: "#0f2027", // gradient start
-              via: "#203a43",     // gradient middle
-              to: "#2c5364",      // gradient end
-              dark: "#121a24",    // modal/input bg
-              darker: "#1b252f",  // card bg
-            },
-            accent: "#00ADB5",      // teal accent
-            textlight: "#DDDDDD",   // soft text
-          },
-          fontFamily: {
-            poppins: ["Poppins", "sans-serif"],
-          },
+      colors: {
+        base: {
+          dark: "#0f2027",   // bg utama
+          mid: "#203a43",    // bg gradasi
+          light: "#2c5364",  // highlight ringan
+          card: "#1b252f",   // card & input
         },
+        accent: "#00ADB5",   // tombol utama, border aktif
+        textlight: "#DDDDDD", // teks terang
       },
-    }
+      backgroundImage: {
+        "gradient-main": "linear-gradient(to bottom right, #0f2027, #203a43, #2c5364)",
+      },
+    },
   },
   plugins: [],
 };

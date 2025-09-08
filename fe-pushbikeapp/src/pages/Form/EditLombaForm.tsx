@@ -2,6 +2,9 @@
 // src/components/admin/EditLombaModal.tsx
 import { useState, useEffect } from "react";
 import { updateLomba, type Kategori } from "@/services/lomba";
+import Button from "@/component/ui/Buttons";
+import Input from "@/component/ui/Input";
+import Select from "@/component/ui/Select";
 
 interface EditLombaModalProps {
   lomba: {
@@ -9,7 +12,7 @@ interface EditLombaModalProps {
     nama: string;
     tanggal: string;
     jumlahPeserta: number;
-    jumlahBatch?: number; // <- tambahkan optional jumlahBatch
+    jumlahBatch?: number;
     biaya: number;
     kategori: Kategori;
   };
@@ -22,7 +25,7 @@ export default function EditLombaModal({ lomba, onClose, onSuccess }: EditLombaM
     nama: "",
     tanggal: "",
     jumlahPeserta: 1,
-    jumlahBatch: 1, // <- default 1
+    jumlahBatch: 1,
     biaya: 0,
     kategori: "boy" as Kategori,
   });
@@ -30,14 +33,13 @@ export default function EditLombaModal({ lomba, onClose, onSuccess }: EditLombaM
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  // Prefill data lomba ketika modal dibuka
   useEffect(() => {
     if (lomba) {
       setForm({
         nama: lomba.nama,
-        tanggal: lomba.tanggal.split("T")[0], // format YYYY-MM-DD
+        tanggal: lomba.tanggal.split("T")[0],
         jumlahPeserta: lomba.jumlahPeserta,
-        jumlahBatch: lomba.jumlahBatch ?? 1, // ambil dari lomba jika ada
+        jumlahBatch: lomba.jumlahBatch ?? 1,
         biaya: lomba.biaya,
         kategori: lomba.kategori,
       });
@@ -51,7 +53,7 @@ export default function EditLombaModal({ lomba, onClose, onSuccess }: EditLombaM
       [name]:
         name === "kategori"
           ? (value as Kategori)
-          : name === "jumlahPeserta" || name === "biaya" || name === "jumlahBatch"
+          : ["jumlahPeserta", "biaya", "jumlahBatch"].includes(name)
           ? Number(value)
           : value,
     });
@@ -63,15 +65,7 @@ export default function EditLombaModal({ lomba, onClose, onSuccess }: EditLombaM
     setError("");
 
     try {
-      await updateLomba(lomba.id, {
-        nama: form.nama,
-        tanggal: form.tanggal,
-        jumlahPeserta: form.jumlahPeserta,
-        jumlahBatch: form.jumlahBatch, // <- kirim ke backend
-        biaya: form.biaya,
-        kategori: form.kategori,
-      });
-
+      await updateLomba(lomba.id, { ...form });
       onSuccess();
       onClose();
     } catch (err: any) {
@@ -83,111 +77,85 @@ export default function EditLombaModal({ lomba, onClose, onSuccess }: EditLombaM
   };
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-50">
-      <div className="bg-[#393E46] text-[#EEEEEE] rounded-2xl shadow-xl w-full max-w-md p-6">
-        <h2 className="text-2xl font-bold mb-4 border-b border-[#00ADB5] pb-2 text-center">
+    <div className="fixed inset-0 flex items-center justify-center bg-black/60 backdrop-blur-sm z-50 font-poppins">
+      <div className="bg-base-dark text-textlight rounded-2xl shadow-2xl w-full max-w-md p-6 border border-accent/40">
+        <h2 className="text-2xl font-bold mb-4 text-center text-accent">
           Edit Lomba
         </h2>
 
         {error && (
-          <p className="text-red-500 text-sm mb-2">
+          <p className="text-red-500 text-sm mb-3 text-center">
             {Array.isArray(error) ? error.join(", ") : error}
           </p>
         )}
 
-        <form onSubmit={handleSubmit} className="space-y-3">
+        <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label className="block mb-1 font-medium">Nama Lomba</label>
-            <input
-              type="text"
-              name="nama"
-              value={form.nama}
-              onChange={handleChange}
-              className="w-full p-2 rounded-lg bg-[#222831] text-[#EEEEEE] border border-[#00ADB5] focus:outline-none focus:ring-2 focus:ring-[#00ADB5]"
-              required
-            />
+            <Input name="nama" value={form.nama} onChange={handleChange} required />
           </div>
 
           <div>
             <label className="block mb-1 font-medium">Tanggal</label>
-            <input
-              type="date"
-              name="tanggal"
-              value={form.tanggal}
-              onChange={handleChange}
-              className="w-full p-2 rounded-lg bg-[#222831] text-[#EEEEEE] border border-[#00ADB5] focus:outline-none focus:ring-2 focus:ring-[#00ADB5]"
-              required
-            />
+            <Input type="date" name="tanggal" value={form.tanggal} onChange={handleChange} required />
           </div>
 
           <div>
             <label className="block mb-1 font-medium">Jumlah Peserta</label>
-            <input
+            <Input
               type="number"
               name="jumlahPeserta"
               value={form.jumlahPeserta}
               onChange={handleChange}
               min={1}
-              className="w-full p-2 rounded-lg bg-[#222831] text-[#EEEEEE] border border-[#00ADB5] focus:outline-none focus:ring-2 focus:ring-[#00ADB5]"
               required
             />
           </div>
 
           <div>
             <label className="block mb-1 font-medium">Jumlah Batch</label>
-            <input
+            <Input
               type="number"
               name="jumlahBatch"
               value={form.jumlahBatch}
               onChange={handleChange}
               min={1}
-              className="w-full p-2 rounded-lg bg-[#222831] text-[#EEEEEE] border border-[#00ADB5] focus:outline-none focus:ring-2 focus:ring-[#00ADB5]"
               required
             />
           </div>
 
           <div>
             <label className="block mb-1 font-medium">Harga Pendaftaran (Rp)</label>
-            <input
+            <Input
               type="number"
               name="biaya"
               value={form.biaya}
               onChange={handleChange}
               min={0}
-              className="w-full p-2 rounded-lg bg-[#222831] text-[#EEEEEE] border border-[#00ADB5] focus:outline-none focus:ring-2 focus:ring-[#00ADB5]"
               required
             />
           </div>
 
           <div>
-            <label className="block mb-1 font-medium">Kategori</label>
-            <select
-              name="kategori"
-              value={form.kategori}
-              onChange={handleChange}
-              className="w-full p-2 rounded-lg bg-[#222831] text-[#EEEEEE] border border-[#00ADB5] focus:outline-none focus:ring-2 focus:ring-[#00ADB5]"
-            >
+            {/* pakai Select custom agar konsisten */}
+            <Select label="Kategori" name="kategori" value={form.kategori} onChange={handleChange}>
               <option value="boy">Boy</option>
               <option value="girl">Girl</option>
-            </select>
+            </Select>
           </div>
 
-          <div className="flex justify-end gap-2 mt-4">
-            <button
+          <div className="flex justify-end gap-2 pt-4">
+            <Button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 rounded-lg bg-gray-600 hover:bg-gray-700"
+              // variant prop akan diabaikan kalau Buttons component sederhana; sesuaikan jika ada variant
               disabled={loading}
             >
               Batal
-            </button>
-            <button
-              type="submit"
-              className="px-4 py-2 rounded-lg bg-[#00ADB5] hover:bg-[#00ADB5]/80 text-[#EEEEEE]"
-              disabled={loading}
-            >
-              {loading ? "Menyimpan..." : "Simpan Perubahan"}
-            </button>
+            </Button>
+            <Button type="submit" disabled={loading}>
+              {loading ? "Menyimpan..." : "Simpan"}
+            </Button>
           </div>
         </form>
       </div>

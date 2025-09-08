@@ -1,6 +1,10 @@
+// src/pages/InputHasilLomba.tsx
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import api from "@/services/api";
+import { Card } from "@/component/ui/Card";
+import Input from "@/component/ui/Input";
+import Buttons from "@/component/ui/Buttons";
 
 interface Peserta {
   id_pendaftaran: number;
@@ -12,16 +16,16 @@ interface Peserta {
   point1?: number;
   point2?: number;
   batch?: number;
-  penaltyPoint?: number; // kolom penalty dari DB
+  penaltyPoint?: number;
 }
 
 interface RowInput {
   platNumber: string;
   nama: string;
   community: string;
-  point: number; 
+  point: number;
   finish: number;
-  penalty: number; // kolom penalty
+  penalty: number;
 }
 
 export default function InputHasilLomba() {
@@ -51,7 +55,7 @@ export default function InputHasilLomba() {
             community: pointValue > 0 ? p.community : "",
             point: pointValue,
             finish: 0,
-            penalty: p.penaltyPoint ?? 0, // isi langsung dari DB kalau ada
+            penalty: p.penaltyPoint ?? 0,
           });
         });
 
@@ -78,7 +82,7 @@ export default function InputHasilLomba() {
     if (id) fetchPeserta();
   }, [id, moto]);
 
-  if (loading) return <p className="text-white">Loading...</p>;
+  if (loading) return <p className="text-textlight font-poppins">Loading...</p>;
 
   const handlePlatChange = (batchIndex: number, rowIndex: number, value: string) => {
     setBatchData((prev) => {
@@ -119,131 +123,147 @@ export default function InputHasilLomba() {
   const handleSimpan = async () => {
     if (!id || !moto) return console.error("ID lomba atau moto tidak ditemukan!");
     try {
-    const pesertaWithPoints = batchData.flatMap((batch) =>
-  batch
-    .filter((r) => r.platNumber)
-    .map((r) => {
-      const pesertaDbItem = pesertaDb.find((p) => p.platNumber === r.platNumber);
-      return {
-        id: pesertaDbItem?.id_pendaftaran,
-        [`point${moto === "moto1" ? "1" : "2"}`]: r.finish + r.penalty,
-        penaltyPoint: r.penalty,
-      };
-    })
-);
+      const pesertaWithPoints = batchData.flatMap((batch) =>
+        batch
+          .filter((r) => r.platNumber)
+          .map((r) => {
+            const pesertaDbItem = pesertaDb.find((p) => p.platNumber === r.platNumber);
+            return {
+              id: pesertaDbItem?.id_pendaftaran,
+              [`point${moto === "moto1" ? "1" : "2"}`]: r.finish + r.penalty,
+              penaltyPoint: r.penalty,
+            };
+          })
+      );
+
       await api.post(`/lomba/${id}/hasil`, {
         moto,
         peserta: pesertaWithPoints,
       });
 
-      alert("Hasil berhasil disimpan!");
+      alert("✅ Hasil berhasil disimpan!");
     } catch (err) {
       console.error("Gagal simpan hasil", err);
     }
   };
 
   return (
-    <div className="p-4 md:p-6 space-y-6">
-      <h1 className="text-2xl md:text-3xl font-bold text-white">
+    <div className="p-4 md:p-6 space-y-6 min-h-screen font-poppins">
+      <h1 className="text-2xl md:text-3xl font-bold text-textlight border-b border-accent pb-2">
         Input Hasil Lomba {moto?.toUpperCase()} - Lomba {id}
       </h1>
 
       {batchData.map((rows, b) => {
         const pesertaBatchDb = pesertaDb.filter((p) => p.batch === b + 1);
+        const maxLength = Math.max(rows.length, pesertaBatchDb.length);
 
         return (
           <div key={b} className="mb-8 grid grid-cols-1 md:grid-cols-2 gap-4">
             {/* Tabel input */}
-            <div className="overflow-x-auto bg-gray-800 p-2 rounded-lg">
-              <h2 className="text-lg md:text-xl font-semibold text-yellow-400 mb-2">
+            <Card className="p-4">
+              <h2 className="text-lg md:text-xl font-semibold text-accent mb-2">
                 Batch {b + 1} - Input
               </h2>
-              <table className="min-w-[400px] w-full border-collapse border border-gray-500 text-sm md:text-base">
+              <table className="w-full border-collapse border border-accent text-sm md:text-base text-textlight table-fixed">
                 <thead>
-                  <tr>
-                    <th className="border p-2 w-16">Plat</th>
-                    <th className="border p-2 min-w-[150px]">Nama Rider</th>
-                    <th className="border p-2 min-w-[120px]">Community</th>
-                    <th className="border p-2 w-16">Finish</th>
-                    {showPenalty && <th className="border p-2 w-20">Penalty</th>}
+                  <tr className="bg-base-mid/60">
+                    <th className="border border-accent p-2 w-20">Plat</th>
+                    <th className="border border-accent p-2 w-40">Nama Rider</th>
+                    <th className="border border-accent p-2 w-40">Community</th>
+                    <th className="border border-accent p-2 w-20">Finish</th>
+                    {showPenalty && <th className="border border-accent p-2 w-24">Penalty</th>}
                   </tr>
                 </thead>
                 <tbody>
-                  {rows.map((row, i) => (
-                    <tr key={i}>
-                      <td className="border p-2">
-                        <input
-                          type="text"
-                          value={row.platNumber}
-                          onChange={(e) => handlePlatChange(b, i, e.target.value)}
-                          className="bg-gray-700 text-white p-1 rounded w-full text-center"
-                        />
-                      </td>
-                      <td className="border p-2 text-white">{row.nama}</td>
-                      <td className="border p-2 text-white">{row.community}</td>
-                      <td className="border p-2 text-white text-center">{row.finish}</td>
-                      {showPenalty && (
-                        <td className="border p-2">
-                          <input
-                            type="number"
-                            min={0}
-                            value={row.penalty}
-                            onChange={(e) => handlePenaltyChange(b, i, Number(e.target.value))}
-                            className="bg-gray-700 text-white p-1 rounded w-full text-center"
-                          />
-                        </td>
-                      )}
-                    </tr>
-                  ))}
+                  {Array.from({ length: maxLength }).map((_, i) => {
+                    const row = rows[i];
+                    return (
+                      <tr key={i} className="h-12 hover:bg-base-light/30">
+                        {row ? (
+                          <>
+                            <td className="border border-accent p-2 align-middle">
+                              <Input
+                                type="text"
+                                size="sm"
+                                value={row.platNumber}
+                                onChange={(e) => handlePlatChange(b, i, e.target.value)}
+                                placeholder="Plat..."
+                                className="text-center bg-accent/40 text-textlight placeholder-accent/40 border border-accent"
+                              />
+                            </td>
+                            <td className="border border-accent p-2 align-middle">{row.nama}</td>
+                            <td className="border border-accent p-2 align-middle">{row.community}</td>
+                            <td className="border border-accent p-2 text-center align-middle">{row.finish}</td>
+                            {showPenalty && (
+                              <td className="border border-accent p-2 align-middle">
+                                <Input
+                                  type="number"
+                                  size="sm"
+                                  min={0}
+                                  value={row.penalty}
+                                  onChange={(e) => handlePenaltyChange(b, i, Number(e.target.value))}
+                                  className="text-center bg-accent/40 text-textlight placeholder-accent/40 border border-accent"
+                                />
+                              </td>
+                            )}
+                          </>
+                        ) : (
+                          <td
+                            colSpan={showPenalty ? 5 : 4}
+                            className="border border-accent text-center text-gray-500 align-middle"
+                          >
+                            -
+                          </td>
+                        )}
+                      </tr>
+                    );
+                  })}
                 </tbody>
               </table>
-            </div>
+            </Card>
 
             {/* Tabel referensi */}
-            <div className="overflow-x-auto bg-gray-800 p-2 rounded-lg">
-              <h2 className="text-lg md:text-xl font-semibold text-green-400 mb-2">
+            <Card className="p-4">
+              <h2 className="text-lg md:text-xl font-semibold text-accent mb-2">
                 Batch {b + 1} - Peserta (DB)
               </h2>
-              <table className="min-w-[120px] w-full border-collapse border border-gray-500 text-sm md:text-base">
+              <table className="w-full border-collapse border border-accent text-sm md:text-base text-textlight table-fixed">
                 <thead>
-                  <tr>
-                    <th className="border p-2 w-12">Plat</th>
+                  <tr className="bg-base-mid/60">
+                    <th className="border border-accent p-2 w-20">Plat</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {pesertaBatchDb.map((p) => (
-                    <tr key={p.id_pendaftaran}>
-                      <td className="border p-2 text-white text-center">{p.platNumber}</td>
-                    </tr>
-                  ))}
+                  {Array.from({ length: maxLength }).map((_, i) => {
+                    const peserta = pesertaBatchDb[i];
+                    return (
+                      <tr key={i} className="h-12 hover:bg-base-light/30">
+                        <td className="border border-accent p-2 text-center align-middle">
+                          {peserta ? peserta.platNumber : "-"}
+                        </td>
+                      </tr>
+                    );
+                  })}
                 </tbody>
               </table>
-            </div>
+            </Card>
           </div>
         );
       })}
 
       <div className="flex flex-wrap justify-center gap-4 mt-4">
-        <button
-          onClick={() => setShowPenalty((prev) => !prev)}
-          className="bg-yellow-600 hover:bg-yellow-700 text-white font-semibold py-2 px-4 rounded-lg shadow-lg"
-        >
+        <Buttons onClick={() => setShowPenalty((prev) => !prev)}>
           {showPenalty ? "Sembunyikan Penalty" : "Tampilkan Penalty"}
-        </button>
+        </Buttons>
 
-        <button
-          onClick={handleSimpan}
-          className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg shadow-lg"
-        >
-          Simpan Hasil
-        </button>
+        <Buttons onClick={handleSimpan}>Simpan Hasil</Buttons>
 
-        <button
+        <Buttons
+          variant="secondary"
           onClick={() => navigate(`/admindashboard/olahdatapeserta/${id}`)}
-          className="bg-gray-600 hover:bg-gray-700 text-white font-semibold py-2 px-4 rounded-lg shadow-lg"
         >
           Kembali
-        </button>
+        </Buttons>
       </div>
     </div>
   );

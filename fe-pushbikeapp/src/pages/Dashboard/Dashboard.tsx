@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import api from "@/services/api";
+import { Card, CardHeader, CardContent } from "@/component/ui/Card";
 
 interface PointSesi {
   id: number;
@@ -43,14 +44,17 @@ export default function DashboardUser() {
         const lombaData: LombaDisplay[] = [];
 
         for (const lomba of res.data) {
-          const pesertaRes = await api.get<Peserta[]>(`/lomba/${lomba.id}/peserta`);
+          const pesertaRes = await api.get<Peserta[]>(
+            `/lomba/${lomba.id}/peserta`
+          );
           const semuaPeserta = pesertaRes.data;
 
           // cari winner sesi 2 berdasarkan finish terendah
           const sesi2All = semuaPeserta
             .map((p) => ({
               peserta: p,
-              finish: p.pointSesi?.find((s) => s.sesi === 2)?.finish ?? Infinity,
+              finish:
+                p.pointSesi?.find((s) => s.sesi === 2)?.finish ?? Infinity,
             }))
             .filter((p) => p.finish !== Infinity);
 
@@ -91,11 +95,13 @@ export default function DashboardUser() {
     return () => clearInterval(interval);
   }, [slides]);
 
-  const nextSlide = () => setCarouselIndex((carouselIndex + 1) % slides.length);
-  const prevSlide = () => setCarouselIndex((carouselIndex - 1 + slides.length) % slides.length);
+  const nextSlide = () =>
+    setCarouselIndex((carouselIndex + 1) % slides.length);
+  const prevSlide = () =>
+    setCarouselIndex((carouselIndex - 1 + slides.length) % slides.length);
 
   return (
-    <div className="min-h-screen bg-base-dark font-poppins px-6 py-12 max-w-7xl mx-auto">
+    <div className="min-h-screen font-poppins px-6 py-12 max-w-7xl mx-auto">
       {/* Header */}
       <h1 className="text-3xl font-bold text-accent mb-6 text-center md:text-left">
         Selamat Datang di Push Bike Race! 🚴‍♂️
@@ -112,32 +118,36 @@ export default function DashboardUser() {
           </h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
             {lombaCards.map((lomba) => (
-              <div
+              <Card
                 key={lomba.id}
-                className="bg-[#00ADB5]/20 border border-[#00ADB5]/40 rounded-2xl p-6 shadow-md  text-textlight cursor-pointer hover:bg-accent hover:text-base-dark hover:shadow-accent/40 hover:scale-[1.03] transition-all duration-300"
+                className="cursor-pointer hover:bg-accent hover:text-base-dark hover:shadow-accent/40 hover:scale-[1.03]"
               >
-                <h3 className="text-lg font-semibold mb-1">{lomba.name}</h3>
-                <p className="text-sm opacity-80">
-                  Tanggal: {new Date(lomba.date).toLocaleDateString()}
-                </p>
-                {lomba.kategori && (
-                  <p className="mt-1 text-sm">
-                    Kategori:{" "}
-                    <span
-                      className={`font-semibold ${
-                        lomba.kategori === "boy"
-                          ? "text-blue-400"
-                          : lomba.kategori === "girl"
-                          ? "text-pink-400"
-                          : "text-accent"
-                      }`}
-                    >
-                      {lomba.kategori}
-                    </span>
+                <CardHeader>
+                  <h3 className="text-lg font-semibold mb-1">{lomba.name}</h3>
+                  <p className="text-sm opacity-80">
+                    Tanggal: {new Date(lomba.date).toLocaleDateString()}
                   </p>
-                )}
-                <p className="mt-2 font-medium">Pemenang: {lomba.winner}</p>
-              </div>
+                  {lomba.kategori && (
+                    <p className="mt-1 text-sm">
+                      Kategori:{" "}
+                      <span
+                        className={`font-semibold ${
+                          lomba.kategori === "boy"
+                            ? "text-blue-400"
+                            : lomba.kategori === "girl"
+                            ? "text-pink-400"
+                            : "text-accent"
+                        }`}
+                      >
+                        {lomba.kategori}
+                      </span>
+                    </p>
+                  )}
+                </CardHeader>
+                <CardContent>
+                  <p className="font-medium">Pemenang: {lomba.winner}</p>
+                </CardContent>
+              </Card>
             ))}
           </div>
         </div>
@@ -145,18 +155,20 @@ export default function DashboardUser() {
         {/* Carousel */}
         <div className="relative">
           {slides.length > 0 && (
-            <div className="bg-[#00ADB5]/20 border border-[#00ADB5]/40 rounded-2xl shadow-md overflow-hidden relative">
+            <Card className="overflow-hidden relative">
               <img
                 src={slides[carouselIndex].image}
                 alt={slides[carouselIndex].name}
                 className="w-full h-40 object-cover"
               />
-              <div className="p-4">
-                <h3 className="font-bold text-lg text-accent">{slides[carouselIndex].name}</h3>
+              <CardContent>
+                <h3 className="font-bold text-lg text-accent">
+                  {slides[carouselIndex].name}
+                </h3>
                 <p className="text-textlight/80 text-sm">
                   Pemenang: {slides[carouselIndex].winner}
                 </p>
-              </div>
+              </CardContent>
 
               {/* Tombol navigasi */}
               <button
@@ -171,7 +183,7 @@ export default function DashboardUser() {
               >
                 ▶
               </button>
-            </div>
+            </Card>
           )}
         </div>
       </div>

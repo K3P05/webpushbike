@@ -15,14 +15,14 @@ export default function TambahLombaModal({ onClose, onSuccess }: TambahLombaModa
     jumlah_peserta: number;
     biaya: number;
     kategori: Kategori;
-    jumlah_batch: number; // tambahkan field ini
+    jumlah_batch: number;
   }>({
     nama: "",
     tanggal: "",
     jumlah_peserta: 1,
     biaya: 0,
-    kategori: "boy", // default harus sesuai enum
-    jumlah_batch: 1, // default 1
+    kategori: "boy",
+    jumlah_batch: 1,
   });
 
   const [loading, setLoading] = useState(false);
@@ -48,11 +48,11 @@ export default function TambahLombaModal({ onClose, onSuccess }: TambahLombaModa
         jumlahPeserta: Number(form.jumlah_peserta),
         biaya: Number(form.biaya),
         kategori: form.kategori,
-        jumlahBatch: Number(form.jumlah_batch), // kirim ke backend
+        jumlahBatch: Number(form.jumlah_batch),
       });
 
       onSuccess();
-      alert("Data lomba berhasil disimpan!")
+      alert("Data lomba berhasil disimpan!");
       onClose();
     } catch (err: any) {
       console.error("Gagal tambah lomba:", err);
@@ -63,105 +63,107 @@ export default function TambahLombaModal({ onClose, onSuccess }: TambahLombaModa
   };
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-50">
-      <div className="bg-[#393E46] text-[#EEEEEE] rounded-2xl shadow-xl w-full max-w-md p-6">
-        <h2 className="text-2xl font-bold mb-4 border-b border-[#00ADB5] pb-2 text-center">
+    <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-50 font-poppins">
+      <div className="bg-[#00ADB5]/20 border border-[#00ADB5]/40 rounded-xl shadow-xl w-full max-w-sm p-4 relative animate-fadeIn">
+        <h2 className="text-lg font-semibold mb-2 border-b border-accent pb-1 text-center">
           Tambah Lomba
         </h2>
 
         {error && (
-          <p className="text-red-500 text-sm mb-2">{Array.isArray(error) ? error.join(", ") : error}</p>
+          <p className="text-red-500 text-xs mb-2">
+            {Array.isArray(error) ? error.join(", ") : error}
+          </p>
         )}
 
-        <form onSubmit={handleSubmit} className="space-y-3">
+        <form onSubmit={handleSubmit} className="space-y-1.5">
           <div>
-            <label className="block mb-1 font-medium">Nama Lomba</label>
+            <label className="block mb-0.5 text-sm">Nama Lomba</label>
             <input
               type="text"
               name="nama"
               value={form.nama}
               onChange={handleChange}
-              className="w-full p-2 rounded-lg bg-[#222831] text-[#EEEEEE] border border-[#00ADB5] focus:outline-none focus:ring-2 focus:ring-[#00ADB5]"
+              className="w-full px-2 py-1 bg-[#222831] text-[#EEEEEE] border border-[#00ADB5] rounded-md focus:outline-none focus:ring-1 focus:ring-[#00ADB5] text-sm"
               required
             />
           </div>
 
           <div>
-            <label className="block mb-1 font-medium">Tanggal</label>
+            <label className="block mb-0.5 text-sm">Tanggal</label>
             <input
               type="date"
               name="tanggal"
               value={form.tanggal}
               onChange={handleChange}
-              className="w-full p-2 rounded-lg bg-[#222831] text-[#EEEEEE] border border-[#00ADB5] focus:outline-none focus:ring-2 focus:ring-[#00ADB5]"
+              className="w-full px-2 py-1 bg-[#222831] text-[#EEEEEE] border border-[#00ADB5] rounded-md focus:outline-none focus:ring-1 focus:ring-[#00ADB5] text-sm"
               required
             />
           </div>
 
           <div>
-            <label className="block mb-1 font-medium">Jumlah Peserta</label>
+            <label className="block mb-0.5 text-sm">Jumlah Peserta</label>
             <input
               type="number"
               name="jumlah_peserta"
               value={form.jumlah_peserta}
               onChange={handleChange}
               min={1}
-              className="w-full p-2 rounded-lg bg-[#222831] text-[#EEEEEE] border border-[#00ADB5] focus:outline-none focus:ring-2 focus:ring-[#00ADB5]"
+              className="w-full px-2 py-1 bg-[#222831] text-[#EEEEEE] border border-[#00ADB5] rounded-md focus:outline-none focus:ring-1 focus:ring-[#00ADB5] text-sm"
               required
             />
           </div>
 
           <div>
-            <label className="block mb-1 font-medium">Jumlah Batch</label>
+            <label className="block mb-0.5 text-sm">Jumlah Batch</label>
             <input
               type="number"
               name="jumlah_batch"
               value={form.jumlah_batch}
               onChange={handleChange}
               min={1}
-              className="w-full p-2 rounded-lg bg-[#222831] text-[#EEEEEE] border border-[#00ADB5] focus:outline-none focus:ring-2 focus:ring-[#00ADB5]"
+              className="w-full px-2 py-1 bg-[#222831] text-[#EEEEEE] border border-[#00ADB5] rounded-md focus:outline-none focus:ring-1 focus:ring-[#00ADB5] text-sm"
               required
             />
           </div>
 
           <div>
-            <label className="block mb-1 font-medium">Harga Pendaftaran (Rp)</label>
+            <label className="block mb-0.5 text-sm">Harga Pendaftaran (Rp)</label>
             <input
               type="number"
               name="biaya"
               value={form.biaya}
               onChange={handleChange}
               min={0}
-              className="w-full p-2 rounded-lg bg-[#222831] text-[#EEEEEE] border border-[#00ADB5] focus:outline-none focus:ring-2 focus:ring-[#00ADB5]"
+              className="w-full px-2 py-1 bg-[#222831] text-[#EEEEEE] border border-[#00ADB5] rounded-md focus:outline-none focus:ring-1 focus:ring-[#00ADB5] text-sm"
               required
             />
           </div>
 
           <div>
-            <label className="block mb-1 font-medium">Kategori</label>
+            <label className="block mb-0.5 text-sm">Kategori</label>
             <select
               name="kategori"
               value={form.kategori}
               onChange={handleChange}
-              className="w-full p-2 rounded-lg bg-[#222831] text-[#EEEEEE] border border-[#00ADB5] focus:outline-none focus:ring-2 focus:ring-[#00ADB5]"
+              className="w-full px-2 py-1 bg-[#222831] text-[#EEEEEE] border border-[#00ADB5] rounded-md focus:outline-none focus:ring-1 focus:ring-[#00ADB5] text-sm"
             >
               <option value="boy">Boy</option>
               <option value="girl">Girl</option>
             </select>
           </div>
 
-          <div className="flex justify-end gap-2 mt-4">
+          <div className="flex justify-end gap-2 mt-3">
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 rounded-lg bg-gray-600 hover:bg-gray-700"
+              className="px-3 py-1.5 rounded-md bg-gray-600 hover:bg-gray-700 text-sm"
               disabled={loading}
             >
               Batal
             </button>
             <button
               type="submit"
-              className="px-4 py-2 rounded-lg bg-[#00ADB5] hover:bg-[#00ADB5]/80 text-[#EEEEEE]"
+              className="px-3 py-1.5 rounded-md bg-accent hover:bg-accent/80 text-textlight text-sm"
               disabled={loading}
             >
               {loading ? "Menyimpan..." : "Simpan"}

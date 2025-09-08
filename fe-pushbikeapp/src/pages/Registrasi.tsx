@@ -126,28 +126,28 @@ export default function Registrasi() {
       {/* Modal Registrasi */}
       {selectedLomba && (
         <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex justify-center items-center z-50">
-          <div className="bg-[#00ADB5]/20 border border-[#00ADB5]/40 rounded-2xl shadow-2xl w-full max-w-md p-8 relative animate-fadeIn">
+          <div className="bg-[#00ADB5]/20 border border-[#00ADB5]/40 rounded-xl shadow-xl w-full max-w-sm p-4 relative animate-fadeIn">
             
             {/* Close button */}
             <button
-              className="absolute top-4 right-4 text-textlight hover:text-accent transition"
+              className="absolute top-3 right-3 text-textlight hover:text-accent transition text-sm"
               onClick={() => setSelectedLomba(null)}
             >
               ✖
             </button>
 
-            <h2 className="text-2xl font-bold mb-6 text-center text-accent">
+            <h2 className="text-lg font-semibold mb-2 text-center text-accent">
               Registrasi {selectedLomba.nama}
             </h2>
 
-            <p className="text-textlight/80 mb-2 text-center">
-              Biaya pendaftaran:{" "}
+            <p className="text-textlight/80 text-center text-sm mb-1">
+              Biaya:{" "}
               <span className="text-accent font-semibold">
                 Rp {selectedLomba.biaya.toLocaleString()}
               </span>
             </p>
-            <p className="text-textlight/80 mb-6 text-center">
-              Kategori lomba:{" "}
+            <p className="text-textlight/80 text-center text-sm mb-4">
+              Kategori:{" "}
               <span
                 className={
                   selectedLomba.kategori === "girl"
@@ -159,66 +159,62 @@ export default function Registrasi() {
               </span>
             </p>
 
-            <form onSubmit={handleSubmit}>
-              <div className="mb-4">
-                <label className="block text-[#EEEEEE] font-medium">Nama</label>
+            <form onSubmit={handleSubmit} className="space-y-2">
+              <div>
+                <label className="block text-[#EEEEEE] text-sm">Nama</label>
                 <input
                   type="text"
                   name="nama"
                   value={formData.nama}
                   onChange={handleChange}
-                  className="w-full mt-1 p-2 bg-[#222831] text-[#EEEEEE] border border-[#00ADB5] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#00ADB5]"
+                  className="w-full px-2 py-1 bg-[#222831] text-[#EEEEEE] border border-[#00ADB5] rounded-md focus:outline-none focus:ring-1 focus:ring-[#00ADB5] text-sm"
                   required
                 />
               </div>
 
-              <div className="mb-4">
-                <label className="block text-[#EEEEEE] font-medium">Plat Number</label>
+              <div>
+                <label className="block text-[#EEEEEE] text-sm">Plat Number</label>
                 <input
                   type="text"
                   name="plat_number"
                   value={formData.plat_number}
                   onChange={handleChange}
-                  className="w-full mt-1 p-2 bg-[#222831] text-[#EEEEEE] border border-[#00ADB5] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#00ADB5]"
+                  className="w-full px-2 py-1 bg-[#222831] text-[#EEEEEE] border border-[#00ADB5] rounded-md focus:outline-none focus:ring-1 focus:ring-[#00ADB5] text-sm"
                   required
                 />
               </div>
 
-              <div className="mb-4">
-                <label className="block text-[#EEEEEE] font-medium">Community</label>
+              <div>
+                <label className="block text-[#EEEEEE] text-sm">Community</label>
                 <input
                   type="text"
                   name="community"
                   value={formData.community}
                   onChange={handleChange}
-                  className="w-full mt-1 p-2 bg-[#222831] text-[#EEEEEE] border border-[#00ADB5] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#00ADB5]"
+                  className="w-full px-2 py-1 bg-[#222831] text-[#EEEEEE] border border-[#00ADB5] rounded-md focus:outline-none focus:ring-1 focus:ring-[#00ADB5] text-sm"
                   required
                 />
               </div>
 
-              <div className="mb-4">
-              <label className="block text-[#EEEEEE] font-medium">No HP</label>
-              <input
-                type="text"
-                name="no_hp"
-                value={formData.no_hp || ""}
-                onChange={handleChange}
-                className="w-full mt-1 p-2 bg-[#222831] text-[#EEEEEE] border border-[#00ADB5] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#00ADB5]"
-                required
-              />
-            </div>
+              <div>
+                <label className="block text-[#EEEEEE] text-sm">No HP</label>
+                <input
+                  type="text"
+                  name="no_hp"
+                  value={formData.no_hp || ""}
+                  onChange={handleChange}
+                  className="w-full px-2 py-1 bg-[#222831] text-[#EEEEEE] border border-[#00ADB5] rounded-md focus:outline-none focus:ring-1 focus:ring-[#00ADB5] text-sm"
+                  required
+                />
+              </div>
 
-
-              <div className="mb-6">
-                <p className="text-[#EEEEEE] font-medium">Metode Pembayaran</p>
-                <p className="text-[#00ADB5] mt-2 font-semibold">
-                  Transfer Bank: BCA 1234567890 a.n Panitia PushBike
-                </p>
+              <div className="text-xs text-center text-textlight/70">
+                Transfer ke <span className="text-accent font-semibold">BCA 1234567890</span> a.n Panitia
               </div>
 
               <button
                 type="submit"
-                className="w-full bg-accent hover:bg-[#00cfd8] text-base-dark font-semibold p-3 rounded-lg shadow-md hover:shadow-accent/40 transition-all"
+                className="w-full bg-accent hover:bg-[#00cfd8] text-base-dark font-semibold py-2 rounded-md shadow-md hover:shadow-accent/40 transition-all text-sm"
               >
                 Daftar
               </button>

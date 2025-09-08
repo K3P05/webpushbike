@@ -41,12 +41,10 @@ export default function AdminDashboard() {
   ];
 
   return (
-    <div className="min-h-screen bg-base-dark font-poppins text-textlight">
+    <div className="min-h-screen font-poppins text-textlight">
       <div className="max-w-6xl mx-auto px-6 py-12">
         {/* Header */}
-        <h1 className="text-3xl font-bold mb-4 text-accent">
-          Dashboard Admin
-        </h1>
+        <h1 className="text-3xl font-bold mb-4 text-accent">Dashboard Admin</h1>
         <p className="text-textlight/70 mb-10">
           Selamat datang, Admin! Silakan pilih menu untuk mengelola data.
         </p>

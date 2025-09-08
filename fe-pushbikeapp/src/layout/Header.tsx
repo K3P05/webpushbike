@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { FiMenu, FiX } from "react-icons/fi";
 import logo from "@/assets/img/logo.png";
 
@@ -7,119 +7,138 @@ export default function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
   const toggleMenu = () => setMenuOpen(!menuOpen);
   const location = useLocation();
+  const navigate = useNavigate();
 
-  const isLoginPage = location.pathname === "/admindashboard";
+  const isAdminPage = location.pathname.startsWith("/admin");
 
-  const navItems = [
+  // menu untuk user
+  const userNavItems = [
     { path: "/registrasi", label: "Registrasi" },
     { path: "/resultlist", label: "Hasil Live" },
     { path: "/tentangkami", label: "Tentang Kami" },
     { path: "/kontak", label: "Kontak" },
   ];
 
+  const navItems = isAdminPage ? [] : userNavItems;
+
+  // fungsi logout → balik ke halaman utama
+  const handleLogout = () => {
+    navigate("/");
+  };
+
   return (
-    <header className="w-full sticky top-0 z-50 font-poppins bg-gradient-to-r from-base-dark/70 via-base-dark/50 to-base-dark/70 backdrop-blur-lg border-b border-card-dark shadow-md transition-all duration-300">
+    <header className="w-full sticky top-0 z-50 font-poppins bg-gradient-main backdrop-blur-lg border-b border-card-dark shadow-md">
       <div className="max-w-7xl mx-auto flex justify-between items-center px-6 py-4">
+       
         {/* Logo */}
-        <Link to="/dashboard" className="flex items-center space-x-2">
-          <img src={logo} alt="PushBike Logo" className="h-14 w-auto" />
-          <span className="font-bold text-textlight text-xl tracking-wide">
-            PushBike Race
+        <Link
+          to={isAdminPage ? "/admindashboard" : "/"}
+          className="flex items-center space-x-2"
+        >
+          <img src={logo} alt="Logo" className="h-12 w-auto" />
+          <span className="font-bold text-xl tracking-wide text-accent hover:underline">
+            {isAdminPage ? "Admin Panel" : "PushBike Race"}
           </span>
         </Link>
 
-        {/* Navbar Desktop */}
-        {!isLoginPage && (
-          <nav className="hidden md:flex">
-            <ul className="flex space-x-6 text-[#EEEEEE] font-medium items-center">
-              <li>
+        {/* Desktop Menu */}
+        <nav className="hidden md:flex">
+          <ul className="flex space-x-6 text-textlight font-medium items-center">
+            {navItems.map((item) => (
+              <li key={item.path}>
                 <Link
-                  to="/registrasi"
-                  className="hover:text-[#00ADB5] transition"
+                  to={item.path}
+                  className={`transition ${
+                    location.pathname === item.path
+                      ? "text-accent border-b-2 border-accent pb-1"
+                      : "hover:text-accent"
+                  }`}
                 >
-                  Registrasi
+                  {item.label}
                 </Link>
               </li>
-              <li>
-                <Link
-                  to="/listhasil"
-                  className="hover:text-[#00ADB5] transition"
-                >
-                  Hasil Live
-                </Link>
-              </li>
-              <li>
-                <Link
-                  to="/kontak"
-                  className="hover:text-[#00ADB5] transition"
-                >
-                  Kontak
-                </Link>
-              </li>
+            ))}
+
+            {/* tombol login admin untuk user */}
+            {!isAdminPage && (
               <li>
                 <Link
                   to="/loginadmin"
-                  onClick={toggleMenu}
-                  className="block px-4 py-2 bg-[#00ADB5] text-[#EEEEEE] rounded-full text-center shadow-[0_0_12px_rgba(0,173,181,0.8)] hover:bg-[#00cfd8] hover:scale-105 transition-all duration-300"
+                  className="px-4 py-2 bg-accent text-white rounded-full shadow hover:bg-accent/80 hover:scale-105 transition"
                 >
                   Login Admin
                 </Link>
               </li>
-            </ul>
-          </nav>
-        )}
+            )}
+
+            {/* tombol logout untuk admin */}
+            {isAdminPage && (
+              <li>
+                <button
+                  onClick={handleLogout}
+                  className="px-4 py-2 bg-red-500 text-white rounded-full shadow hover:bg-red-600 hover:scale-105 transition"
+                >
+                  Logout
+                </button>
+              </li>
+            )}
+          </ul>
+        </nav>
 
         {/* Mobile Toggle */}
-        {!isLoginPage && (
-          <button
-            onClick={toggleMenu}
-            className="md:hidden text-2xl text-textlight focus:outline-none"
-          >
-            {menuOpen ? <FiX /> : <FiMenu />}
-          </button>
-        )}
+        <button
+          onClick={toggleMenu}
+          className="md:hidden text-2xl text-textlight"
+        >
+          {menuOpen ? <FiX /> : <FiMenu />}
+        </button>
       </div>
 
-      {/* Navbar Mobile */}
-      {menuOpen && !isLoginPage && (
-        <nav className="md:hidden bg-[#222831] border-t border-[#393E46] shadow-md">
-          <ul className="flex flex-col space-y-4 p-6 text-[#EEEEEE] font-medium">
-            <li>
-              <Link
-                to="/registrasi"
-                onClick={toggleMenu}
-                className="hover:text-[#00ADB5] transition"
-              >
-                Registrasi
-              </Link>
-            </li>
-            <li>
-              <Link
-                to="/listhasil"
-                onClick={toggleMenu}
-                className="hover:text-[#00ADB5] transition"
-              >
-                Hasil Live
-              </Link>
-            </li>
-            <li>
-              <Link
-                to="/kontak"
-                onClick={toggleMenu}
-                className="hover:text-[#00ADB5] transition"
-              >
-                Kontak
-              </Link>
-            </li>
-            <li>
-              <Link
-                to="/loginadmin"
-                onClick={toggleMenu}
-                className="block px-4 py-2 bg-[#00ADB5] text-[#EEEEEE] rounded-full text-center shadow-[0_0_12px_rgba(0,173,181,0.8)] hover:bg-[#00cfd8] hover:scale-105 transition-all duration-300"
-              >
-                Login Admin
-              </Link>
-            </li>
+      {/* Mobile Menu */}
+      {menuOpen && (
+        <nav className="md:hidden bg-base-darker border-t border-card-dark shadow-md">
+          <ul className="flex flex-col space-y-4 p-6 text-textlight font-medium">
+            {navItems.map((item) => (
+              <li key={item.path}>
+                <Link
+                  to={item.path}
+                  onClick={toggleMenu}
+                  className={`transition ${
+                    location.pathname === item.path
+                      ? "text-accent border-l-4 border-accent pl-2"
+                      : "hover:text-accent"
+                  }`}
+                >
+                  {item.label}
+                </Link>
+              </li>
+            ))}
+
+            {!isAdminPage && (
+              <li>
+                <Link
+                  to="/loginadmin"
+                  onClick={toggleMenu}
+                  className="px-4 py-2 bg-accent text-white rounded-full shadow hover:bg-accent/80 transition"
+                >
+                  Login Admin
+                </Link>
+              </li>
+            )}
+
+            {isAdminPage && (
+              <li>
+                <button
+                  onClick={() => {
+                    toggleMenu();
+                    handleLogout();
+                  }}
+                  className="px-4 py-2 bg-red-500 text-white rounded-full shadow hover:bg-red-600 transition"
+                >
+                  Logout
+                </button>
+              </li>
+            )}
           </ul>
         </nav>
       )}
