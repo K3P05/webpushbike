@@ -74,14 +74,36 @@ export class LombaService {
   }
 
 async simpanHasil(id: number, moto: string, peserta: any[]) {
-    for (const p of peserta) {
-      await this.pesertaRepository.update(p.id, {
-        [moto === "moto1" ? "point1" : "point2"]: 
-          p[moto === "moto1" ? "point1" : "point2"],
-      });
+  for (const p of peserta) {
+    const pesertaId = p.id ?? p.id_pendaftaran; // FE kirim id, tapi sebenarnya itu id_pendaftaran
+
+    if (!pesertaId) {
+      console.warn("❌ Peserta tanpa id_pendaftaran", p);
+      continue;
     }
-    return { message: "Hasil berhasil disimpan" };
+
+    const updateData: any = {
+      penaltyPoint: p.penaltyPoint ?? 0, // selalu simpan penalty
+    };
+
+    if (moto === "moto1") {
+      updateData.point1 = p.point1 ?? 0;
+    } else if (moto === "moto2") {
+      updateData.point2 = p.point2 ?? 0;
+    }
+
+    const result = await this.pesertaRepository.update(
+      { id_pendaftaran: pesertaId },
+      updateData,
+    );
+
+    if (result.affected === 0) {
+      console.warn(`⚠️ Tidak ada peserta dengan id_pendaftaran=${pesertaId}`);
+    }
   }
+
+  return { message: "Hasil berhasil disimpan" };
+}
 
   
 

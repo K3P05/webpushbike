@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import api from "@/services/api";
@@ -16,7 +17,6 @@ interface PesertaBatch {
   rank?: number;
   gate1?: number;
   gate2?: number | null;
-  localId?: number;
 }
 
 interface PesertaSesi {
@@ -31,6 +31,9 @@ interface PesertaSesi {
   point2: number;
   totalPoint: number;
   finish?: number | null;
+  finishSesi1?: number | null;
+  penaltyPoint?: number;
+  matchName?: string | null;
 }
 
 interface Lomba {
@@ -73,6 +76,7 @@ export default function LiveHasil() {
           point1: p.point1 ?? 0,
           point2: p.point2 ?? 0,
           totalPoint: (p.point1 ?? 0) + (p.point2 ?? 0),
+          matchName: p.matchName ?? null
         }));
 
         const batchSize = Math.ceil(pesertaData.length / (lombaRes.data.jumlahBatch || 1));
@@ -99,7 +103,7 @@ export default function LiveHasil() {
           }
         });
 
-        // === Generate gate1 & gate2 untuk setiap batch ===
+        // Generate gate1 & gate2 untuk setiap batch
         const generateGates = (n: number) =>
           Array.from({ length: n }, (_, i) => {
             const gate1 = i + 1;
@@ -118,33 +122,38 @@ export default function LiveHasil() {
         setBatchPeserta(emptyBatches);
 
         /** ============ Sesi 1 ============ **/
-        const resSesi1 = await api.get<PesertaSesi[]>(`/lomba/${id}/peserta`);
-        const allPeserta1 = (resSesi1.data ?? []).map((p: any) => ({
-          id_pendaftaran: p.id_pendaftaran,
-          batch: p.batch,
-          gateMoto1: p.gate1 ?? 0,
-          gateMoto2: p.gate2 ?? 0,
-          platNumber: p.platNumber,
-          nama: p.nama,
-          team: p.community ?? "",
-          point1: p.point1 ?? 0,
-          point2: p.point2 ?? 0,
-          totalPoint: (p.point1 ?? 0) + (p.point2 ?? 0),
-          finish: p.pointSesi?.find((s: any) => s.sesi === 1)?.finish ?? null,
-        }));
+        const resSesi = await api.get<PesertaSesi[]>(`/lomba/${id}/peserta`);
+        const allPeserta1 = (resSesi.data ?? []).map((p: any) => {
+          const sesi1 = p.pointSesi?.find((s: any) => s.sesi === 1);
+          return {
+            id_pendaftaran: p.id_pendaftaran,
+            batch: p.batch,
+            gateMoto1: p.gate1 ?? 0,
+            gateMoto2: p.gate2 ?? 0,
+            platNumber: p.platNumber,
+            nama: p.nama,
+            team: p.community ?? "",
+            point1: p.point1 ?? 0,
+            point2: p.point2 ?? 0,
+            totalPoint: (p.point1 ?? 0) + (p.point2 ?? 0),
+            finish: sesi1?.finish ?? null,
+            matchName: sesi1?.matchName ?? "Nama match belum diupdate",
+          };
+        });
 
-        const batches1 = Array.from(new Set(allPeserta1.map(p => p.batch))).sort((a,b)=>a-b);
+        const batches1 = Array.from(new Set(allPeserta1.map(p => p.batch))).sort((a, b) => a - b);
         const utama1: PesertaSesi[] = [];
         const sekunder1: PesertaSesi[] = [];
+
         batches1.forEach(batchNum => {
           const batchPeserta = allPeserta1.filter(p => p.batch === batchNum);
-          batchPeserta.sort((a,b)=>a.totalPoint - b.totalPoint);
-          const half = Math.floor(batchPeserta.length / 2);
+          batchPeserta.sort((a, b) => a.totalPoint - b.totalPoint);
+          const half = Math.ceil(batchPeserta.length / 2);
           utama1.push(...batchPeserta.slice(0, half));
           sekunder1.push(...batchPeserta.slice(half));
         });
 
-        const buatMatch1 = (arr: PesertaSesi[], batchesCount: number) => {
+        const buatMatch = (arr: PesertaSesi[], batchesCount: number) => {
           const matches: PesertaSesi[][] = [];
           const halfBatch = Math.ceil(batchesCount / 2);
           for (let i = 0; i < halfBatch; i++) {
@@ -161,75 +170,58 @@ export default function LiveHasil() {
           return matches;
         };
 
-        // CHANGED: simpan hasil match sesi 1 ke variabel lokal, lalu set state
-        const matchesSesi1Utama = buatMatch1(utama1, batches1.length);   // CHANGED
-        const matchesSesi1Sekunder = buatMatch1(sekunder1, batches1.length); // CHANGED
+        const matchesSesi1Utama = buatMatch(utama1, batches1.length);
+        const matchesSesi1Sekunder = buatMatch(sekunder1, batches1.length);
         setSesi1Utama(matchesSesi1Utama);
         setSesi1Sekunder(matchesSesi1Sekunder);
 
-        /** ============ Sesi 2 ============ **/
-        const allPeserta2 = (resSesi1.data ?? []).map((p: any) => ({
-          id_pendaftaran: p.id_pendaftaran,
-          batch: p.batch,
-          gateMoto1: p.gateMoto1,
-          gateMoto2: p.gateMoto2,
-          platNumber: p.platNumber,
-          nama: p.nama,
-          team: p.community ?? "",
-          point1: p.point1 ?? 0,
-          point2: p.point2 ?? 0,
-          totalPoint: (p.point1 ?? 0) + (p.point2 ?? 0),
-          finish: p.pointSesi?.find((s: any) => s.sesi === 2)?.finish ?? null,
-        }));
-
-        // pisahkan Utama & Sekunder seperti sesi 1
-        const batches2 = Array.from(new Set(allPeserta2.map(p => p.batch))).sort((a, b) => a - b);
-        const utama2: PesertaSesi[] = [];
-        const sekunder2: PesertaSesi[] = [];
-
-        batches2.forEach(batchNum => {
-          const batchPeserta = allPeserta2.filter(p => p.batch === batchNum);
-          batchPeserta.sort((a, b) => a.totalPoint - b.totalPoint);
-          const half = Math.ceil(batchPeserta.length / 2);
-          utama2.push(...batchPeserta.slice(0, half));
-          sekunder2.push(...batchPeserta.slice(half));
+        /** ============ Sesi 2 (Update) ============ **/
+        const allPeserta2 = (resSesi.data ?? []).map((p: any) => {
+          const sesi2 = p.pointSesi?.find((s: any) => s.sesi === 2);
+          return {
+            id_pendaftaran: p.id_pendaftaran,
+            batch: p.batch,
+            gateMoto1: p.gate1 ?? 0,
+            gateMoto2: p.gate2 ?? 0,
+            platNumber: p.platNumber,
+            nama: p.nama,
+            team: p.community ?? "",
+            point1: p.point1 ?? 0,
+            point2: p.point2 ?? 0,
+            totalPoint: (p.point1 ?? 0) + (p.point2 ?? 0),
+            finishSesi1: p.pointSesi?.find((s: any) => s.sesi === 1)?.finish ?? null,
+            finish: sesi2?.finish ?? null,
+            penaltyPoint: sesi2?.penaltyPoint ?? 0,
+            matchName: sesi2?.matchName ?? "Nama match belum diupdate",
+          };
         });
 
-        // CHANGED: ambil struktur dari Sesi 1 (jumlah peserta per match)
-        const strukturDariSesi1 = (matches: PesertaSesi[][]) => matches.map(m => m.length); // CHANGED
-        const strukturUtama = strukturDariSesi1(matchesSesi1Utama);   // CHANGED
-        const strukturSekunder = strukturDariSesi1(matchesSesi1Sekunder); // CHANGED
+        const idSetUtama1 = new Set(utama1.map(p => p.id_pendaftaran));
+        const idSetSekunder1 = new Set(sekunder1.map(p => p.id_pendaftaran));
 
-        // CHANGED: buat match Sesi 2 dengan struktur yang sama persis seperti Sesi 1
-        // buat match sesi 2 sesuai struktur dari sesi 1
-const buatMatch2DenganStruktur = (arr: PesertaSesi[], struktur: number[]) => {
-  // urutkan berdasarkan finish (null dianggap besar)
-  const sorted = [...arr].sort((a, b) => (a.finish ?? 999) - (b.finish ?? 999));
+        const poolUtama2 = allPeserta2
+          .filter(p => idSetUtama1.has(p.id_pendaftaran))
+          .sort((a, b) => (a.finishSesi1 ?? 999999) - (b.finishSesi1 ?? 999999));
 
-  // siapkan array matches sesuai struktur
-  const matches: PesertaSesi[][] = Array.from({ length: struktur.length }, () => []);
+        const poolSekunder2 = allPeserta2
+          .filter(p => idSetSekunder1.has(p.id_pendaftaran))
+          .sort((a, b) => (a.finishSesi1 ?? 999999) - (b.finishSesi1 ?? 999999));
 
-  let index = 0;
-  sorted.forEach((peserta) => {
-    let matchIndex = index % struktur.length;
+        const allocateByStructure = (pool: PesertaSesi[], structure: PesertaSesi[][]) => {
+          const result: PesertaSesi[][] = structure.map(() => []);
+          let cursor = 0;
+          structure.forEach((match, mi) => {
+            const size = match.length;
+            result[mi] = pool.slice(cursor, cursor + size);
+            cursor += size;
+          });
+          return result;
+        };
 
-    // cari slot kosong sesuai struktur
-    while (matches[matchIndex].length >= struktur[matchIndex]) {
-      matchIndex = (matchIndex + 1) % struktur.length;
-    }
+        setSesi2Utama(allocateByStructure(poolUtama2, matchesSesi1Utama));
+        setSesi2Sekunder(allocateByStructure(poolSekunder2, matchesSesi1Sekunder));
 
-    matches[matchIndex].push(peserta);
-    index++;
-  });
-
-  return matches;
-};
-
-
-        setSesi2Utama(buatMatch2DenganStruktur(utama2, strukturUtama));       // CHANGED
-        setSesi2Sekunder(buatMatch2DenganStruktur(sekunder2, strukturSekunder)); // CHANGED
-
-      } catch(err:any) {
+      } catch (err: any) {
         console.error(err);
         setError("Gagal memuat data live hasil");
       } finally {
@@ -259,7 +251,6 @@ const buatMatch2DenganStruktur = (arr: PesertaSesi[], struktur: number[]) => {
               <th className="border p-2">Point1</th>
               <th className="border p-2">Point2</th>
               <th className="border p-2">Total</th>
-              <th className="border p-2">Rank</th>
             </tr>
           </thead>
           <tbody>
@@ -273,7 +264,6 @@ const buatMatch2DenganStruktur = (arr: PesertaSesi[], struktur: number[]) => {
                 <td className="border p-2">{p.point1}</td>
                 <td className="border p-2">{p.point2}</td>
                 <td className="border p-2">{p.totalPoint}</td>
-                <td className="border p-2">{p.rank}</td>
               </tr>
             ))}
           </tbody>
@@ -285,7 +275,10 @@ const buatMatch2DenganStruktur = (arr: PesertaSesi[], struktur: number[]) => {
   const renderSesiTable = (matches: PesertaSesi[][], title: string) =>
     matches.map((match, idx) => (
       <div key={`${title}-${idx}`} className="bg-gray-800 p-4 rounded-lg mb-6">
-        <h2 className="text-xl font-semibold text-cyan-400">{title} - Match {idx+1}</h2>
+        <h2 className="text-xl font-semibold text-cyan-400">
+          {match[0]?.matchName ?? `${title} - Match ${idx+1}`}
+        </h2>
+
         <table className="w-full border-collapse border border-gray-500 mt-2 text-white">
           <thead>
             <tr>

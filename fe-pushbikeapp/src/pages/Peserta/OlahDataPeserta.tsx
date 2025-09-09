@@ -188,50 +188,51 @@ export default function OlahDataPeserta() {
 
   return (
     <div className="p-6 space-y-8">
-      <h1 className="text-2xl font-bold text-white">Olah Data Peserta</h1>
+      <h1 className="text-2xl font-bold text-white">Olah Data Pertandingan</h1>
 
       {batchPeserta.map((batch, i) => {
         const batchRanked = rankPeserta(batch);
         return (
           <div key={i} className="bg-gray-800 p-4 rounded-lg">
             <h2 className="text-xl font-semibold text-cyan-400">Batch {i + 1}</h2>
-            <table className="w-full border-collapse border border-gray-500 mt-2">
+            <table className="w-full border-collapse border border-gray-500 mt-2 text-center text-white">
               <thead>
                 <tr>
-                  <th className="border p-2">Gate Moto1</th>
-                  <th className="border p-2">Gate Moto2</th>
-                  <th className="border p-2">Plat Number</th>
-                  <th className="border p-2">Nama</th>
-                  <th className="border p-2">Community</th>
-                  <th className="border p-2">Point1</th>
-                  <th className="border p-2">Point2</th>
-                  <th className="border p-2">Total Point</th>
-                  <th className="border p-2">Rank</th>
+                  <th className="border p-1 w-16">Gate 1</th>
+                  <th className="border p-1 w-16">Gate 2</th>
+                  <th className="border p-1 w-20">Plat</th>
+                  <th className="border p-1 w-32">Nama</th>
+                  <th className="border p-1 w-32">Community</th>
+                  <th className="border p-1 w-16">Point1</th>
+                  <th className="border p-1 w-16">Point2</th>
+                  <th className="border p-1 w-20">Total</th>
+                  <th className="border p-1 w-16">Rank</th>
                 </tr>
               </thead>
               <tbody>
                 {batchRanked.map((p, idx) => (
                   <tr key={idx}>
-                    <td className="border p-2">{p.gate1}</td>
-                    <td className="border p-2">{p.gate2}</td>
-                    <td className="border p-2">
+                    <td className="border p-1">{p.gate1}</td>
+                    <td className="border p-1">{p.gate2}</td>
+                    <td className="border p-1">
                       <input
                         type="text"
                         value={p.platNumber}
                         onChange={(e) => handlePlatChange(i, idx, e.target.value)}
-                        className="bg-gray-700 text-white p-1 rounded w-full"
+                        className="bg-gray-700 text-white p-1 rounded w-full text-center"
                       />
                     </td>
-                    <td className="border p-2">{p.nama}</td>
-                    <td className="border p-2">{p.community}</td>
-                    <td className="border p-2">{p.point1}</td>
-                    <td className="border p-2">{p.point2}</td>
-                    <td className="border p-2">{p.totalPoint}</td>
-                    <td className="border p-2">{p.rank}</td>
+                    <td className="border p-1">{p.nama}</td>
+                    <td className="border p-1">{p.community}</td>
+                    <td className="border p-1">{p.point1}</td>
+                    <td className="border p-1">{p.point2}</td>
+                    <td className="border p-1">{p.totalPoint}</td>
+                    <td className="border p-1">{p.rank}</td>
                   </tr>
                 ))}
               </tbody>
             </table>
+
           </div>
         );
       })}

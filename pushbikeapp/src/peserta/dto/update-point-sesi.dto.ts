@@ -15,4 +15,9 @@ export class UpdatePointSesiDto {
   @IsOptional()
   @IsInt()
   point?: number;
+
+  @IsOptional()
+  @IsInt()
+  penaltyPoint?: number;
+  
 }

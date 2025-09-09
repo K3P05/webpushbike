@@ -6,6 +6,7 @@ import { CreatePesertaDto } from './dto/create-peserta.dto';
 import { UpdateBatchDto } from './dto/update-peserta.dto';
 import { UpdatePointSesiBulkDto } from './dto/update-point-sesi-bulk.dto';
 import { UpdateStatusPembayaranDto } from './dto/update-status-pembayaran.dto';
+import { UpdateMatchNameDto } from './dto/update-match-name.dto';
 
 @Controller('lomba/:id/peserta')
 export class PesertaController {
@@ -34,14 +35,22 @@ export class PesertaController {
 
    // ✅ Tambahan endpoint update point sesi
   // src/peserta/peserta.controller.ts
-  @Post('pointsesi')
-  updatePointSesi(
+  @Post('hasil-kualifikasi')
+  saveHasilKualifikasi(
     @Param('id', ParseIntPipe) lombaId: number,
-    @Body() dto: UpdatePointSesiBulkDto,
+    @Body() dto: UpdatePointSesiBulkDto, // berisi point1/point2 dan optional penaltyPoint
   ) {
-    // cukup kirim dto saja
     return this.pesertaService.updatePointSesiBulk(lombaId, dto.data);
   }
+
+  @Post('hasil-sesi')
+  saveHasilSesi(
+    @Param('id', ParseIntPipe) lombaId: number,
+    @Body() dto: UpdatePointSesiBulkDto, // hanya berisi finish + penaltyPoint
+  ) {
+    return this.pesertaService.updateFinishSesiBulk(lombaId, dto.data);
+  }
+
 
   @Patch(':pesertaId/status')
   updateStatusPembayaran(
@@ -51,5 +60,22 @@ export class PesertaController {
   ) {
     return this.pesertaService.updateStatusPembayaran(lombaId, pesertaId, dto);
   }
+
+  @Get('sesi/:sesi')
+async getPesertaBySesi(
+  @Param('id', ParseIntPipe) lombaId: number,
+  @Param('sesi', ParseIntPipe) sesi: number
+) {
+  return this.pesertaService.findBySesi(lombaId, sesi);
+}
+
+@Post(':match/name')
+updateMatchName(
+  @Param('id', ParseIntPipe) lombaId: number,
+  @Body() dto: UpdateMatchNameDto,
+) {
+  return this.pesertaService.updateMatchName(lombaId, dto);
+}
+
 }
 
