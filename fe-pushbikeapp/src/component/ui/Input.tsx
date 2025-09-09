@@ -1,3 +1,4 @@
+// src/component/ui/Input.tsx
 import type { InputHTMLAttributes } from "react";
 
 type InputProps = Omit<InputHTMLAttributes<HTMLInputElement>, "size"> & {
@@ -6,7 +7,7 @@ type InputProps = Omit<InputHTMLAttributes<HTMLInputElement>, "size"> & {
 
 export default function Input({
   className = "",
-  size = "md",
+  size = "sm", // <-- default ubah ke "sm"
   ...rest
 }: InputProps) {
   const sizeClasses =

@@ -10,9 +10,9 @@ export default function Button({ variant = "primary", className = "", ...props }
 
   const variants = {
     primary:
-      "bg-accent text-white shadow-soft hover:bg-accent/80 hover:shadow-strong",
+      "bg-accent text-white shadow-md hover:bg-accent/80 hover:shadow-lg focus:ring-2 focus:ring-accent/60",
     secondary:
-      "bg-base-dark text-textlight border border-accent/40 hover:bg-accent/20",
+      "bg-base-dark text-textlight border border-accent/40 hover:bg-accent/20 focus:ring-2 focus:ring-accent/60",
   };
 
   return (

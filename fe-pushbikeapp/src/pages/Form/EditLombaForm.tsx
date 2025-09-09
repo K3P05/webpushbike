@@ -20,7 +20,11 @@ interface EditLombaModalProps {
   onSuccess: () => void;
 }
 
-export default function EditLombaModal({ lomba, onClose, onSuccess }: EditLombaModalProps) {
+export default function EditLombaModal({
+  lomba,
+  onClose,
+  onSuccess,
+}: EditLombaModalProps) {
   const [form, setForm] = useState({
     nama: "",
     tanggal: "",
@@ -46,7 +50,9 @@ export default function EditLombaModal({ lomba, onClose, onSuccess }: EditLombaM
     }
   }, [lomba]);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
     const { name, value } = e.target;
     setForm({
       ...form,
@@ -90,70 +96,73 @@ export default function EditLombaModal({ lomba, onClose, onSuccess }: EditLombaM
         )}
 
         <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label className="block mb-1 font-medium">Nama Lomba</label>
-            <Input name="nama" value={form.nama} onChange={handleChange} required />
-          </div>
+          <Input
+            label="Nama Lomba"
+            name="nama"
+            value={form.nama}
+            onChange={handleChange}
+            required
+          />
 
-          <div>
-            <label className="block mb-1 font-medium">Tanggal</label>
-            <Input type="date" name="tanggal" value={form.tanggal} onChange={handleChange} required />
-          </div>
+          <Input
+            label="Tanggal"
+            type="date"
+            name="tanggal"
+            value={form.tanggal}
+            onChange={handleChange}
+            required
+          />
 
-          <div>
-            <label className="block mb-1 font-medium">Jumlah Peserta</label>
-            <Input
-              type="number"
-              name="jumlahPeserta"
-              value={form.jumlahPeserta}
-              onChange={handleChange}
-              min={1}
-              required
-            />
-          </div>
+          <Input
+            label="Jumlah Peserta"
+            type="number"
+            name="jumlahPeserta"
+            value={form.jumlahPeserta}
+            onChange={handleChange}
+            min={1}
+            required
+          />
 
-          <div>
-            <label className="block mb-1 font-medium">Jumlah Batch</label>
-            <Input
-              type="number"
-              name="jumlahBatch"
-              value={form.jumlahBatch}
-              onChange={handleChange}
-              min={1}
-              required
-            />
-          </div>
+          <Input
+            label="Jumlah Batch"
+            type="number"
+            name="jumlahBatch"
+            value={form.jumlahBatch}
+            onChange={handleChange}
+            min={1}
+            required
+          />
 
-          <div>
-            <label className="block mb-1 font-medium">Harga Pendaftaran (Rp)</label>
-            <Input
-              type="number"
-              name="biaya"
-              value={form.biaya}
-              onChange={handleChange}
-              min={0}
-              required
-            />
-          </div>
+          <Input
+            label="Harga Pendaftaran (Rp)"
+            type="number"
+            name="biaya"
+            value={form.biaya}
+            onChange={handleChange}
+            min={0}
+            required
+          />
 
-          <div>
-            {/* pakai Select custom agar konsisten */}
-            <Select label="Kategori" name="kategori" value={form.kategori} onChange={handleChange}>
-              <option value="boy">Boy</option>
-              <option value="girl">Girl</option>
-            </Select>
-          </div>
+          <Select
+            label="Kategori"
+            name="kategori"
+            value={form.kategori}
+            onChange={handleChange}
+          >
+            <option value="boy">Boy</option>
+            <option value="girl">Girl</option>
+          </Select>
 
           <div className="flex justify-end gap-2 pt-4">
             <Button
               type="button"
+              variant="secondary"
               onClick={onClose}
-              // variant prop akan diabaikan kalau Buttons component sederhana; sesuaikan jika ada variant
               disabled={loading}
             >
               Batal
             </Button>
-            <Button type="submit" disabled={loading}>
+            <Button type="submit" variant="primary" disabled={loading}>
               {loading ? "Menyimpan..." : "Simpan"}
             </Button>
           </div>

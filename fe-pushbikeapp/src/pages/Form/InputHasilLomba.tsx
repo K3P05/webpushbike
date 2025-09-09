@@ -1,4 +1,3 @@
-// src/pages/InputHasilLomba.tsx
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import api from "@/services/api";
@@ -184,7 +183,6 @@ export default function InputHasilLomba() {
                             <td className="border border-accent p-2 align-middle">
                               <Input
                                 type="text"
-                                size="sm"
                                 value={row.platNumber}
                                 onChange={(e) => handlePlatChange(b, i, e.target.value)}
                                 placeholder="Plat..."
@@ -198,7 +196,6 @@ export default function InputHasilLomba() {
                               <td className="border border-accent p-2 align-middle">
                                 <Input
                                   type="number"
-                                  size="sm"
                                   min={0}
                                   value={row.penalty}
                                   onChange={(e) => handlePenaltyChange(b, i, Number(e.target.value))}

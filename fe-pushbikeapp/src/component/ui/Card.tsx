@@ -1,4 +1,4 @@
-import * as React from "react"
+import * as React from "react";
 
 export function Card({
   className = "",
@@ -6,10 +6,10 @@ export function Card({
 }: React.HTMLAttributes<HTMLDivElement>) {
   return (
     <div
-      className={`rounded-2xl border border-[#00ADB5]/40 bg-[#00ADB5]/20 shadow-md transition-all duration-300 ${className}`}
+      className={`rounded-2xl border border-accent/40 bg-base-card shadow-md transition-all duration-300 ${className}`}
       {...props}
     />
-  )
+  );
 }
 
 export function CardHeader({
@@ -18,10 +18,10 @@ export function CardHeader({
 }: React.HTMLAttributes<HTMLDivElement>) {
   return (
     <div
-      className={`p-4 border-b border-[#00ADB5]/30 ${className}`}
+      className={`p-4 border-b border-accent/30 ${className}`}
       {...props}
     />
-  )
+  );
 }
 
 export function CardContent({
@@ -33,5 +33,5 @@ export function CardContent({
       className={`p-4 ${className}`}
       {...props}
     />
-  )
+  );
 }

@@ -83,7 +83,8 @@ export default function TambahLombaModal({ onClose, onSuccess }: TambahLombaModa
               name="nama"
               value={form.nama}
               onChange={handleChange}
-              className="w-full px-2 py-1 bg-[#222831] text-[#EEEEEE] border border-[#00ADB5] rounded-md focus:outline-none focus:ring-1 focus:ring-[#00ADB5] text-sm"
+              placeholder="Silahkan masukan nama lomba"
+              className="w-full px-3 py-2 bg-[#222831] text-[#EEEEEE] placeholder:text-[#EEEEEE] border border-[#00ADB5] rounded-md focus:outline-none focus:ring-1 focus:ring-[#00ADB5] text-sm"
               required
             />
           </div>
@@ -95,7 +96,8 @@ export default function TambahLombaModal({ onClose, onSuccess }: TambahLombaModa
               name="tanggal"
               value={form.tanggal}
               onChange={handleChange}
-              className="w-full px-2 py-1 bg-[#222831] text-[#EEEEEE] border border-[#00ADB5] rounded-md focus:outline-none focus:ring-1 focus:ring-[#00ADB5] text-sm"
+              placeholder="Pilih tanggal lomba"
+              className="w-full px-3 py-2 bg-[#222831] text-[#EEEEEE] placeholder:text-textlight/60 border border-[#00ADB5] rounded-md focus:outline-none focus:ring-1 focus:ring-[#00ADB5] text-sm"
               required
             />
           </div>
@@ -108,7 +110,8 @@ export default function TambahLombaModal({ onClose, onSuccess }: TambahLombaModa
               value={form.jumlah_peserta}
               onChange={handleChange}
               min={1}
-              className="w-full px-2 py-1 bg-[#222831] text-[#EEEEEE] border border-[#00ADB5] rounded-md focus:outline-none focus:ring-1 focus:ring-[#00ADB5] text-sm"
+              placeholder="Masukkan jumlah peserta"
+              className="w-full px-3 py-2 bg-[#222831] text-[#EEEEEE] placeholder:text-textlight/60 border border-[#00ADB5] rounded-md focus:outline-none focus:ring-1 focus:ring-[#00ADB5] text-sm"
               required
             />
           </div>
@@ -121,7 +124,8 @@ export default function TambahLombaModal({ onClose, onSuccess }: TambahLombaModa
               value={form.jumlah_batch}
               onChange={handleChange}
               min={1}
-              className="w-full px-2 py-1 bg-[#222831] text-[#EEEEEE] border border-[#00ADB5] rounded-md focus:outline-none focus:ring-1 focus:ring-[#00ADB5] text-sm"
+              placeholder="Masukkan jumlah batch"
+              className="w-full px-3 py-2 bg-[#222831] text-[#EEEEEE] placeholder:text-textlight/60 border border-[#00ADB5] rounded-md focus:outline-none focus:ring-1 focus:ring-[#00ADB5] text-sm"
               required
             />
           </div>
@@ -134,7 +138,8 @@ export default function TambahLombaModal({ onClose, onSuccess }: TambahLombaModa
               value={form.biaya}
               onChange={handleChange}
               min={0}
-              className="w-full px-2 py-1 bg-[#222831] text-[#EEEEEE] border border-[#00ADB5] rounded-md focus:outline-none focus:ring-1 focus:ring-[#00ADB5] text-sm"
+              placeholder="Masukkan biaya (Rp)"
+              className="w-full px-3 py-2 bg-[#222831] text-[#EEEEEE] placeholder:text-textlight/60 border border-[#00ADB5] rounded-md focus:outline-none focus:ring-1 focus:ring-[#00ADB5] text-sm"
               required
             />
           </div>
@@ -145,12 +150,17 @@ export default function TambahLombaModal({ onClose, onSuccess }: TambahLombaModa
               name="kategori"
               value={form.kategori}
               onChange={handleChange}
-              className="w-full px-2 py-1 bg-[#222831] text-[#EEEEEE] border border-[#00ADB5] rounded-md focus:outline-none focus:ring-1 focus:ring-[#00ADB5] text-sm"
+              className="w-full px-3 py-2 bg-[#222831] text-[#EEEEEE] border border-[#00ADB5] rounded-md focus:outline-none focus:ring-1 focus:ring-[#00ADB5] text-sm"
             >
-              <option value="boy">Boy</option>
-              <option value="girl">Girl</option>
+              <option value="boy" className="text-blue-400 bg-[#222831]">
+                Boy
+              </option>
+              <option value="girl" className="text-pink-400 bg-[#222831]">
+                Girl
+              </option>
             </select>
           </div>
+
 
           <div className="flex justify-end gap-2 mt-3">
             <button
