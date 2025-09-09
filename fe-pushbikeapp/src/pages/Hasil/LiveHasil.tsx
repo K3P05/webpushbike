@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import api from "@/services/api";
@@ -16,12 +17,6 @@ interface PesertaBatch {
   rank?: number;
   gate1?: number;
   gate2?: number | null;
-  localId?: number;
-}
-
-interface PointSesi {
-  sesi: number;
-  finish: number;
 }
 
 interface PesertaSesi {
@@ -36,6 +31,9 @@ interface PesertaSesi {
   point2: number;
   totalPoint: number;
   finish?: number | null;
+  finishSesi1?: number | null;
+  penaltyPoint?: number;
+  matchName?: string | null;
 }
 
 interface Lomba {
@@ -79,6 +77,7 @@ export default function LiveHasil() {
           point1: p.point1 ?? 0,
           point2: p.point2 ?? 0,
           totalPoint: (p.point1 ?? 0) + (p.point2 ?? 0),
+          matchName: p.matchName ?? null
         }));
 
         const batchSize = Math.ceil(
@@ -112,7 +111,7 @@ export default function LiveHasil() {
           }
         });
 
-        // === Generate gate1 & gate2 untuk setiap batch ===
+        // Generate gate1 & gate2 untuk setiap batch
         const generateGates = (n: number) =>
           Array.from({ length: n }, (_, i) => {
             const gate1 = i + 1;
@@ -131,40 +130,38 @@ export default function LiveHasil() {
         setBatchPeserta(emptyBatches);
 
         /** ============ Sesi 1 ============ **/
-        const resSesi1 = await api.get<(PesertaSesi & { pointSesi?: PointSesi[] })[]>(
-          `/lomba/${id}/peserta`
-        );
+        const resSesi = await api.get<PesertaSesi[]>(`/lomba/${id}/peserta`);
+        const allPeserta1 = (resSesi.data ?? []).map((p: any) => {
+          const sesi1 = p.pointSesi?.find((s: any) => s.sesi === 1);
+          return {
+            id_pendaftaran: p.id_pendaftaran,
+            batch: p.batch,
+            gateMoto1: p.gate1 ?? 0,
+            gateMoto2: p.gate2 ?? 0,
+            platNumber: p.platNumber,
+            nama: p.nama,
+            team: p.community ?? "",
+            point1: p.point1 ?? 0,
+            point2: p.point2 ?? 0,
+            totalPoint: (p.point1 ?? 0) + (p.point2 ?? 0),
+            finish: sesi1?.finish ?? null,
+            matchName: sesi1?.matchName ?? "Nama match belum diupdate",
+          };
+        });
 
-        const allPeserta1: PesertaSesi[] = (resSesi1.data ?? []).map((p) => ({
-          id_pendaftaran: p.id_pendaftaran,
-          batch: p.batch,
-          gateMoto1: (p as any).gate1 ?? 0,
-          gateMoto2: (p as any).gate2 ?? 0,
-          platNumber: p.platNumber,
-          nama: p.nama,
-          team: (p as any).community ?? "",
-          point1: p.point1 ?? 0,
-          point2: p.point2 ?? 0,
-          totalPoint: (p.point1 ?? 0) + (p.point2 ?? 0),
-          finish: p.pointSesi?.find((s) => s.sesi === 1)?.finish ?? null,
-        }));
-
-        const batches1 = Array.from(new Set(allPeserta1.map((p) => p.batch))).sort(
-          (a, b) => a - b
-        );
-
+        const batches1 = Array.from(new Set(allPeserta1.map(p => p.batch))).sort((a, b) => a - b);
         const utama1: PesertaSesi[] = [];
         const sekunder1: PesertaSesi[] = [];
 
-        batches1.forEach((batchNum) => {
-          const batchPeserta = allPeserta1.filter((p) => p.batch === batchNum);
-          batchPeserta.sort((a, b) => b.totalPoint - a.totalPoint);
-          const half = Math.floor(batchPeserta.length / 2);
+        batches1.forEach(batchNum => {
+          const batchPeserta = allPeserta1.filter(p => p.batch === batchNum);
+          batchPeserta.sort((a, b) => a.totalPoint - b.totalPoint);
+          const half = Math.ceil(batchPeserta.length / 2);
           utama1.push(...batchPeserta.slice(0, half));
           sekunder1.push(...batchPeserta.slice(half));
         });
 
-        const buatMatch1 = (arr: PesertaSesi[], batchesCount: number) => {
+        const buatMatch = (arr: PesertaSesi[], batchesCount: number) => {
           const matches: PesertaSesi[][] = [];
           const halfBatch = Math.ceil(batchesCount / 2);
           for (let i = 0; i < halfBatch; i++) {
@@ -183,79 +180,58 @@ export default function LiveHasil() {
           return matches;
         };
 
-        const matchesSesi1Utama = buatMatch1(utama1, batches1.length);
-        const matchesSesi1Sekunder = buatMatch1(sekunder1, batches1.length);
-
+        const matchesSesi1Utama = buatMatch(utama1, batches1.length);
+        const matchesSesi1Sekunder = buatMatch(sekunder1, batches1.length);
         setSesi1Utama(matchesSesi1Utama);
         setSesi1Sekunder(matchesSesi1Sekunder);
 
-        /** ============ Sesi 2 ============ **/
-        const allPeserta2: PesertaSesi[] = (resSesi1.data ?? []).map((p) => ({
-          id_pendaftaran: p.id_pendaftaran,
-          batch: p.batch,
-          gateMoto1: (p as any).gateMoto1,
-          gateMoto2: (p as any).gateMoto2,
-          platNumber: p.platNumber,
-          nama: p.nama,
-          team: (p as any).community ?? "",
-          point1: p.point1 ?? 0,
-          point2: p.point2 ?? 0,
-          totalPoint: (p.point1 ?? 0) + (p.point2 ?? 0),
-          finish: p.pointSesi?.find((s) => s.sesi === 2)?.finish ?? null,
-        }));
-
-        const batches2 = Array.from(new Set(allPeserta2.map((p) => p.batch))).sort(
-          (a, b) => a - b
-        );
-
-        const utama2: PesertaSesi[] = [];
-        const sekunder2: PesertaSesi[] = [];
-
-        batches2.forEach((batchNum) => {
-          const batchPeserta = allPeserta2.filter((p) => p.batch === batchNum);
-          batchPeserta.sort((a, b) => b.totalPoint - a.totalPoint);
-          const half = Math.ceil(batchPeserta.length / 2);
-          utama2.push(...batchPeserta.slice(0, half));
-          sekunder2.push(...batchPeserta.slice(half));
+        /** ============ Sesi 2 (Update) ============ **/
+        const allPeserta2 = (resSesi.data ?? []).map((p: any) => {
+          const sesi2 = p.pointSesi?.find((s: any) => s.sesi === 2);
+          return {
+            id_pendaftaran: p.id_pendaftaran,
+            batch: p.batch,
+            gateMoto1: p.gate1 ?? 0,
+            gateMoto2: p.gate2 ?? 0,
+            platNumber: p.platNumber,
+            nama: p.nama,
+            team: p.community ?? "",
+            point1: p.point1 ?? 0,
+            point2: p.point2 ?? 0,
+            totalPoint: (p.point1 ?? 0) + (p.point2 ?? 0),
+            finishSesi1: p.pointSesi?.find((s: any) => s.sesi === 1)?.finish ?? null,
+            finish: sesi2?.finish ?? null,
+            penaltyPoint: sesi2?.penaltyPoint ?? 0,
+            matchName: sesi2?.matchName ?? "Nama match belum diupdate",
+          };
         });
 
-        const strukturDariSesi1 = (matches: PesertaSesi[][]) =>
-          matches.map((m) => m.length);
+        const idSetUtama1 = new Set(utama1.map(p => p.id_pendaftaran));
+        const idSetSekunder1 = new Set(sekunder1.map(p => p.id_pendaftaran));
 
-        const strukturUtama = strukturDariSesi1(matchesSesi1Utama);
-        const strukturSekunder = strukturDariSesi1(matchesSesi1Sekunder);
+        const poolUtama2 = allPeserta2
+          .filter(p => idSetUtama1.has(p.id_pendaftaran))
+          .sort((a, b) => (a.finishSesi1 ?? 999999) - (b.finishSesi1 ?? 999999));
 
-        const buatMatch2DenganStruktur = (
-          arr: PesertaSesi[],
-          struktur: number[]
-        ) => {
-          const sorted = [...arr].sort(
-            (a, b) => (a.finish ?? 999) - (b.finish ?? 999)
-          );
+        const poolSekunder2 = allPeserta2
+          .filter(p => idSetSekunder1.has(p.id_pendaftaran))
+          .sort((a, b) => (a.finishSesi1 ?? 999999) - (b.finishSesi1 ?? 999999));
 
-          const matches: PesertaSesi[][] = Array.from(
-            { length: struktur.length },
-            () => []
-          );
-
-          let index = 0;
-          sorted.forEach((peserta) => {
-            let matchIndex = index % struktur.length;
-
-            while (matches[matchIndex].length >= struktur[matchIndex]) {
-              matchIndex = (matchIndex + 1) % struktur.length;
-            }
-
-            matches[matchIndex].push(peserta);
-            index++;
+        const allocateByStructure = (pool: PesertaSesi[], structure: PesertaSesi[][]) => {
+          const result: PesertaSesi[][] = structure.map(() => []);
+          let cursor = 0;
+          structure.forEach((match, mi) => {
+            const size = match.length;
+            result[mi] = pool.slice(cursor, cursor + size);
+            cursor += size;
           });
-
-          return matches;
+          return result;
         };
 
-        setSesi2Utama(buatMatch2DenganStruktur(utama2, strukturUtama));
-        setSesi2Sekunder(buatMatch2DenganStruktur(sekunder2, strukturSekunder));
-      } catch (err) {
+        setSesi2Utama(allocateByStructure(poolUtama2, matchesSesi1Utama));
+        setSesi2Sekunder(allocateByStructure(poolSekunder2, matchesSesi1Sekunder));
+
+      } catch (err: any) {
         console.error(err);
         setError("Gagal memuat data live hasil");
       } finally {
@@ -290,7 +266,6 @@ export default function LiveHasil() {
               <th className="border p-2">Point1</th>
               <th className="border p-2">Point2</th>
               <th className="border p-2">Total</th>
-              <th className="border p-2">Rank</th>
             </tr>
           </thead>
           <tbody>
@@ -304,7 +279,6 @@ export default function LiveHasil() {
                 <td className="border p-2">{p.point1}</td>
                 <td className="border p-2">{p.point2}</td>
                 <td className="border p-2">{p.totalPoint}</td>
-                <td className="border p-2">{p.rank}</td>
               </tr>
             ))}
           </tbody>
@@ -315,15 +289,13 @@ export default function LiveHasil() {
 
   const renderSesiTable = (matches: PesertaSesi[][], title: string) =>
     matches.map((match, idx) => (
-      <div
-        key={`${title}-${idx}`}
-        className="bg-base-card p-4 rounded-2xl shadow-md mb-6"
-      >
-        <h2 className="text-xl font-semibold text-accent mb-3">
-          {title} - Match {idx + 1}
+      <div key={`${title}-${idx}`} className="bg-gray-800 p-4 rounded-lg mb-6">
+        <h2 className="text-xl font-semibold text-cyan-400">
+          {match[0]?.matchName ?? `${title} - Match ${idx+1}`}
         </h2>
-        <table className="w-full border-collapse border border-base-light text-textlight">
-          <thead className="bg-base-mid">
+
+        <table className="w-full border-collapse border border-gray-500 mt-2 text-white">
+          <thead>
             <tr>
               <th className="border p-2">Gate Start</th>
               <th className="border p-2">Finish</th>

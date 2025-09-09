@@ -34,6 +34,7 @@ export default function InputHasilLomba() {
   const [batchData, setBatchData] = useState<RowInput[][]>([]);
   const [loading, setLoading] = useState(true);
   const [showPenalty, setShowPenalty] = useState(false);
+  
 
   useEffect(() => {
     const fetchPeserta = async () => {
@@ -147,9 +148,9 @@ export default function InputHasilLomba() {
   };
 
   return (
-    <div className="p-4 md:p-6 space-y-6 min-h-screen font-poppins">
-      <h1 className="text-2xl md:text-3xl font-bold text-textlight border-b border-accent pb-2">
-        Input Hasil Lomba {moto?.toUpperCase()} - Lomba {id}
+    <div className="p-4 md:p-6 space-y-6">
+      <h1 className="text-2xl md:text-3xl font-bold text-white">
+        Input Hasil Lomba {moto?.toUpperCase()}
       </h1>
 
       {batchData.map((rows, b) => {

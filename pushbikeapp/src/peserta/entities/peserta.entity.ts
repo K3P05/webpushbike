@@ -33,8 +33,8 @@ export class Peserta {
   @Column({ nullable: true, default: 0 })
   penaltyPoint: number;
 
-  @OneToMany(() => PointSesi, pointSesi => pointSesi.peserta, { cascade: true })
-  pointsesi: PointSesi[];
+  @OneToMany(() => PointSesi, (pointSesi) => pointSesi.peserta, { cascade: true })
+  pointSesi: PointSesi[];
 
   @Column({ type: 'int', nullable: true })
   batch: number;
@@ -55,7 +55,5 @@ export class Peserta {
   @Column({ type: 'int' })
   lomba_id: number; 
 
-  @OneToMany(() => PointSesi, (pointSesi) => pointSesi.peserta, { cascade: true })
-  pointSesi: PointSesi[];
 
 }

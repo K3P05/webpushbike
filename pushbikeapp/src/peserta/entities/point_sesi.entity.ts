@@ -7,7 +7,7 @@ export class PointSesi {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ManyToOne(() => Peserta, peserta => peserta.pointsesi)
+  @ManyToOne(() => Peserta, peserta => peserta.pointSesi)
   peserta: Peserta;
 
   @Column()
@@ -21,5 +21,8 @@ export class PointSesi {
 
   @Column({ name: 'penalty_point', type: 'int', default: 0 })
   penaltyPoint: number;
+
+  @Column({ name: 'match_name', type: 'varchar', length: 100, nullable: true })
+  matchName?: string; // ✅ tambahan untuk nama match
 
 }
