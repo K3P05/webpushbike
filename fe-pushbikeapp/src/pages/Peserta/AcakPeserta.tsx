@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
 import api from "@/services/api";
+import Button from "@/component/ui/Buttons"; // ✅ pakai UI Button theme
 
 type Peserta = {
   id_pendaftaran: number;
@@ -43,7 +44,7 @@ export default function WheelAcakPeserta() {
         const pesertaRes = await api.get<Peserta[]>(`/lomba/${id}/peserta`);
         const data: Peserta[] = pesertaRes.data.map(p => ({
           ...p,
-          batch: p.batch ?? undefined
+          batch: p.batch ?? undefined,
         }));
 
         setPesertaList(data);
@@ -51,7 +52,6 @@ export default function WheelAcakPeserta() {
         const remainingPeserta = data.filter(p => !p.batch);
         setRemaining(remainingPeserta);
 
-        // Isi hasilBatch dari peserta yang sudah punya batch
         const existingBatch: HasilBatch[] = data
           .filter(p => p.batch)
           .map(p => ({ peserta: p, batch: p.batch! }));
@@ -59,7 +59,6 @@ export default function WheelAcakPeserta() {
 
         const lastBatch = Math.max(0, ...existingBatch.map(h => h.batch));
         setCurrentBatch(lastBatch > 0 ? lastBatch : 1);
-
       } catch (err) {
         console.error("Gagal fetch data:", err);
       }
@@ -67,6 +66,7 @@ export default function WheelAcakPeserta() {
     fetchData();
   }, [id]);
 
+  // 🎡 Draw wheel pakai canvas
   const drawWheel = () => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -80,7 +80,7 @@ export default function WheelAcakPeserta() {
     ctx.clearRect(0, 0, width, height);
 
     if (remaining.length === 0) {
-      ctx.fillStyle = "#EEEEEE";
+      ctx.fillStyle = "#DDDDDD"; // text-light
       ctx.font = "bold 32px sans-serif";
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
@@ -98,14 +98,14 @@ export default function WheelAcakPeserta() {
       ctx.moveTo(width / 2, height / 2);
       ctx.arc(width / 2, height / 2, radius, start, end);
       ctx.closePath();
-      // Highlight peserta terpilih
-      if (pesertaTerpilih?.id_pendaftaran === p.id_pendaftaran) {
-        ctx.fillStyle = "#FFD700"; // gold
-      } else {
-        ctx.fillStyle = i % 2 === 0 ? "#00ADB5" : "#393E46";
-      }
+      ctx.fillStyle =
+        pesertaTerpilih?.id_pendaftaran === p.id_pendaftaran
+          ? "#FFD700" // gold untuk highlight
+          : i % 2 === 0
+          ? "#00ADB5" // accent
+          : "#1B252F"; // base-card
       ctx.fill();
-      ctx.strokeStyle = "#EEEEEE";
+      ctx.strokeStyle = "#EEEEEE"; // text-light
       ctx.stroke();
 
       ctx.save();
@@ -118,7 +118,7 @@ export default function WheelAcakPeserta() {
       ctx.restore();
     });
 
-    // Pointer jam 3
+    // Pointer
     ctx.beginPath();
     ctx.moveTo(width / 2 + radius + 15, height / 2);
     ctx.lineTo(width / 2 + radius - 25, height / 2 - 20);
@@ -128,50 +128,53 @@ export default function WheelAcakPeserta() {
     ctx.fill();
   };
 
-  useEffect(() => { drawWheel(); }, [rotation, remaining, pesertaTerpilih]);
+  useEffect(() => {
+    drawWheel();
+  }, [rotation, remaining, pesertaTerpilih]);
 
+  // 🎲 Spin random peserta
   const spinOne = async () => {
     if (spinning || remaining.length === 0) return;
 
-    // Jika sisa satu peserta, langsung pilih
     if (remaining.length === 1) {
-        setPesertaTerpilih(remaining[0]);
-        return;
+      setPesertaTerpilih(remaining[0]);
+      return;
     }
 
     setSpinning(true);
 
     const anglePer = (2 * Math.PI) / remaining.length;
-    const fullRotations = 5 + Math.floor(Math.random() * 3); // variasi rotasi agar lebih natural
+    const fullRotations = 5 + Math.floor(Math.random() * 3);
     const selectedIndex = Math.floor(Math.random() * remaining.length);
 
     const startRotation = rotation;
     const targetRotation =
-        2 * Math.PI * fullRotations +
-        (2 * Math.PI - (selectedIndex * anglePer + anglePer / 2) - (rotation % (2 * Math.PI)));
+      2 * Math.PI * fullRotations +
+      (2 * Math.PI -
+        (selectedIndex * anglePer + anglePer / 2) -
+        (rotation % (2 * Math.PI)));
 
     const duration = 4000;
+    const cubicEaseOut = (t: number) => 1 - Math.pow(1 - t, 3);
 
-    const cubicEaseOut = (t: number) => 1 - Math.pow(1 - t, 3); // easing cubic out
-
-    await new Promise<void>((resolve) => {
-        const startTime = performance.now();
-        const animate = (time: number) => {
+    await new Promise<void>(resolve => {
+      const startTime = performance.now();
+      const animate = (time: number) => {
         const elapsed = time - startTime;
         const t = Math.min(elapsed / duration, 1);
         const eased = cubicEaseOut(t);
         setRotation(startRotation + targetRotation * eased);
         if (t < 1) requestAnimationFrame(animate);
         else resolve();
-        };
-        requestAnimationFrame(animate);
+      };
+      requestAnimationFrame(animate);
     });
 
     setPesertaTerpilih(remaining[selectedIndex]);
     setSpinning(false);
-    };
+  };
 
-
+  // ✅ Konfirmasi peserta terpilih masuk batch
   const confirmPeserta = () => {
     if (!pesertaTerpilih || !lomba) return;
     const batchMax = Math.ceil(pesertaList.length / lomba.jumlahBatch);
@@ -187,6 +190,7 @@ export default function WheelAcakPeserta() {
     setPesertaTerpilih(null);
   };
 
+  // ✅ Simpan semua batch ke API
   const handleSimpan = async () => {
     if (!lomba) return;
     try {
@@ -215,45 +219,54 @@ export default function WheelAcakPeserta() {
   };
 
   return (
-    <div className="min-h-screen bg-[#222831] font-poppins px-6 py-12">
-      <h1 className="text-2xl font-bold text-[#EEEEEE] mb-6">{lomba?.nama || "Lomba"} - Acak Peserta Wheel</h1>
+    <div className="min-h-screen font-poppins px-6 py-12">
+      <h1 className="text-2xl font-bold text-textlight mb-6">
+        {lomba?.nama || "Lomba"} - Acak Peserta Wheel
+      </h1>
 
       <div className="flex justify-center mb-6">
-        <canvas ref={canvasRef} width={600} height={600} className="rounded-full border-4 border-[#EEEEEE]" />
+        <canvas
+          ref={canvasRef}
+          width={600}
+          height={600}
+          className="rounded-full border-4 border-textlight"
+        />
       </div>
 
-      <div className="flex justify-center mb-6 space-x-4">
-        <button
-        onClick={spinOne}
-        disabled={spinning || remaining.length === 0} // Hapus cek pesertaTerpilih
-        className="px-6 py-2 bg-green-500 rounded-lg hover:bg-green-600"
+      <div className="flex justify-center mb-6 gap-4">
+        <Button
+          onClick={spinOne}
+          disabled={spinning || remaining.length === 0}
+          variant="success"
         >
-        {spinning ? "Berputar..." : "Acak Satu Peserta"}
-        </button>
+          {spinning ? "Berputar..." : "Acak Satu Peserta"}
+        </Button>
 
-        <button
+        <Button
           onClick={confirmPeserta}
           disabled={!pesertaTerpilih}
-          className="px-6 py-2 bg-yellow-500 rounded-lg hover:bg-yellow-600"
+          variant="warning"
         >
           Konfirmasi Peserta
-        </button>
+        </Button>
       </div>
 
       <div className="mb-6">
-        <h2 className="text-[#00ADB5] font-bold mb-2">Peserta Terpilih Saat Ini:</h2>
+        <h2 className="text-accent font-bold mb-2">Peserta Terpilih Saat Ini:</h2>
         {pesertaTerpilih ? (
-          <p className="text-yellow-400 font-bold">{pesertaTerpilih.nama} → Batch {currentBatch}</p>
+          <p className="text-warning font-bold">
+            {pesertaTerpilih.nama} → Batch {currentBatch}
+          </p>
         ) : (
-          <p className="text-[#EEEEEE]">Belum ada peserta terpilih</p>
+          <p className="text-textlight">Belum ada peserta terpilih</p>
         )}
       </div>
 
       {hasilBatch.length > 0 && (
         <div className="overflow-x-auto">
-          <h2 className="text-[#00ADB5] font-bold mb-2">Tabel Batch Final:</h2>
-          <table className="min-w-full border border-[#EEEEEE]/20 text-[#EEEEEE] text-sm rounded-lg overflow-hidden">
-            <thead className="bg-[#00ADB5] text-[#222831]">
+          <h2 className="text-accent font-bold mb-2">Tabel Batch Final:</h2>
+          <table className="min-w-full border border-textlight/20 text-textlight text-sm rounded-lg overflow-hidden">
+            <thead className="bg-accent text-base">
               <tr>
                 <th className="px-3 py-2">ID</th>
                 <th className="px-3 py-2">Nama</th>
@@ -265,9 +278,12 @@ export default function WheelAcakPeserta() {
             </thead>
             <tbody>
               {hasilBatch
-                .sort((a, b) => a.batch - b.batch) // Urutkan berdasarkan batch
+                .sort((a, b) => a.batch - b.batch)
                 .map((h, idx) => (
-                  <tr key={h.peserta.id_pendaftaran} className="border-t border-[#EEEEEE]/20 hover:bg-[#00ADB5]/20">
+                  <tr
+                    key={h.peserta.id_pendaftaran}
+                    className="border-t border-textlight/20 hover:bg-accent/20"
+                  >
                     <td className="px-3 py-2">{idx + 1}</td>
                     <td className="px-3 py-2">{h.peserta.nama}</td>
                     <td className="px-3 py-2">{h.peserta.kategori}</td>
@@ -280,15 +296,13 @@ export default function WheelAcakPeserta() {
           </table>
 
           <div className="flex justify-center mt-6">
-            <button
+            <Button
               onClick={handleSimpan}
               disabled={hasilBatch.length !== pesertaList.length}
-              className={`px-6 py-2 rounded-lg text-white ${
-                hasilBatch.length === pesertaList.length ? "bg-blue-500 hover:bg-blue-600" : "bg-gray-500 cursor-not-allowed"
-              }`}
+              variant={hasilBatch.length === pesertaList.length ? "primary" : "disabled"}
             >
               Simpan Data Batch
-            </button>
+            </Button>
           </div>
         </div>
       )}

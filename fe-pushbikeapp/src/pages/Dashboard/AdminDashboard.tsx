@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import TambahLombaModal from "@/pages/Form/TambahLombaForm";
 import api from "@/services/api";
+import { Card, CardHeader, CardContent } from "@/component/ui/Card";
 
 type MenuItem = {
   title: string;
@@ -16,7 +17,6 @@ export default function AdminDashboard() {
   const [openModal, setOpenModal] = useState(false);
   const [lombaCount, setLombaCount] = useState(0);
 
-  // fetch jumlah lomba
   const fetchLombaCount = async () => {
     try {
       const res = await api.get("/lomba");
@@ -32,46 +32,58 @@ export default function AdminDashboard() {
 
   const menuItems: MenuItem[] = [
     { title: "➕ Tambah Lomba", desc: "Tambahkan lomba baru", action: () => setOpenModal(true) },
-    { title: "➕ Kelola Data Lomba", desc: "Pengelolaan data lomba yang sudah ada", path: "kelolalomba" },
+    { title: "🛠️ Kelola Data Lomba", desc: "Pengelolaan data lomba yang sudah ada", path: "kelolalomba" },
     { title: "👥 Daftar Peserta", desc: "Lihat dan kelola peserta", path: "daftarpeserta" },
     { title: "📋 Daftar Lomba", desc: `Semua lomba (${lombaCount})`, path: "daftarlomba" },
-    { title: "📩 Lihat Pesan", desc: `Semua Pesan Yang Masuk`, path: "lihatpesan" },
+    { title: "📩 Lihat Pesan", desc: "Semua Pesan Yang Masuk", path: "lihatpesan" },
     { title: "☑️ Status Peserta", desc: "Status Pembayaran peserta", path: "checkpeserta" },
     { title: "📊 Statistik", desc: "Statistik lomba & peserta", path: "statistik" },
   ];
 
   return (
-    <div className="min-h-screen bg-[#222831] font-poppins">
-      <div className="max-w-6xl mx-auto px-6 py-12">
-        <h1 className="text-3xl font-bold mb-4 text-[#EEEEEE]">Dashboard Admin</h1>
-        <p className="text-[#EEEEEE]/70 mb-10">
-          Selamat datang, Admin! Silakan pilih menu untuk mengelola data.
-        </p>
+    <div className="max-w-6xl mx-auto px-4 py-10">
+      <h1 className="text-3xl font-bold mb-4 text-text-light">Dashboard Admin</h1>
+      <p className="text-text-light/70 mb-10">
+        Selamat datang, Admin! Silakan pilih menu untuk mengelola data.
+      </p>
 
-        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
-          {menuItems.map((item, idx) => (
-            <div
-              key={idx}
-              onClick={() => (item.action ? item.action() : item.path && navigate(item.path))}
-              className="bg-[#393E46] shadow-md rounded-2xl p-8 cursor-pointer text-center hover:bg-[#00ADB5] hover:shadow-lg transition group"
-            >
-              <h2 className="text-xl font-semibold mb-2 text-[#EEEEEE] group-hover:text-[#222831]">
+      {/* Grid Menu */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        {menuItems.map((item, idx) => (
+          <Card
+            key={idx}
+            onClick={() => (item.action ? item.action() : item.path && navigate(item.path))}
+            className="cursor-pointer bg-base-card hover:bg-base-light/20 
+                       transform hover:scale-105 hover:shadow-xl 
+                       transition-all duration-300 group"
+          >
+            <CardHeader className="text-center">
+              <h2 className="text-xl font-semibold text-text-light group-hover:text-accent transition-colors">
                 {item.title}
               </h2>
-              <p className="text-[#EEEEEE]/70 group-hover:text-[#222831]">{item.desc}</p>
-            </div>
-          ))}
-        </div>
+            </CardHeader>
+            <CardContent>
+              <p className="text-center text-text-light/70 group-hover:text-text-light transition-colors">
+                {item.desc}
+              </p>
+            </CardContent>
+          </Card>
+        ))}
       </div>
 
-      {/* Render modal hanya kalau openModal = true */}
+      {/* Modal Pop-up */}
       {openModal && (
-        <TambahLombaModal
-          onClose={() => setOpenModal(false)}
-          onSuccess={() => {
-            fetchLombaCount();
-          }}
-        />
+        <div className="fixed inset-0 flex items-center justify-center bg-black/60 backdrop-blur-sm z-50">
+          <div className="bg-base-card rounded-2xl shadow-lg w-full max-w-lg p-6 animate-fadeIn">
+            <TambahLombaModal
+              onClose={() => setOpenModal(false)}
+              onSuccess={() => {
+                fetchLombaCount();
+                setOpenModal(false);
+              }}
+            />
+          </div>
+        </div>
       )}
     </div>
   );

@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "@/services/api";
+import Button from "@/component/ui/Buttons";
 
 type Lomba = {
   id: number;
@@ -28,8 +29,8 @@ export default function CheckPeserta() {
   }, []);
 
   return (
-    <div className="p-6 max-w-5xl mx-auto bg-[#222831] min-h-screen font-poppins">
-      <h1 className="text-3xl font-bold text-[#00ADB5] mb-6 text-center">
+    <div className="p-6 max-w-5xl mx-auto min-h-screen font-poppins">
+      <h1 className="text-3xl font-bold text-accent mb-6 text-center">
         Admin - Cek Pembayaran Peserta 🚴
       </h1>
 
@@ -37,11 +38,11 @@ export default function CheckPeserta() {
         {lombaList.map((lomba) => (
           <div
             key={lomba.id}
-            className="bg-[#393E46] shadow-lg rounded-xl p-6 flex flex-col justify-between hover:shadow-xl transition"
+            className="bg-base-card shadow-md rounded-xl p-6 flex flex-col justify-between hover:shadow-lg transition"
           >
             <div>
-              <h2 className="text-xl font-semibold text-[#EEEEEE]">{lomba.nama}</h2>
-              <p className="text-gray-300 text-sm">
+              <h2 className="text-xl font-semibold text-textlight">{lomba.nama}</h2>
+              <p className="text-textlight/70 text-sm">
                 {new Date(lomba.tanggal).toLocaleDateString()}
               </p>
               <p className="mt-1 font-semibold">
@@ -54,17 +55,18 @@ export default function CheckPeserta() {
                   {lomba.kategori}
                 </span>
               </p>
-              <p className="text-[#EEEEEE]/80 text-sm">
+              <p className="text-textlight/80 text-sm">
                 Biaya: Rp {lomba.biaya.toLocaleString()}
               </p>
             </div>
 
-            <button
+            <Button
               onClick={() => navigate(`/pesertalomba/${lomba.id}`)}
-              className="mt-4 w-full bg-[#00ADB5] hover:bg-[#019ca4] text-[#EEEEEE] font-semibold px-4 py-2 rounded-lg shadow transition"
+              className="mt-4 w-full"
+              variant="primary"
             >
               Cek Peserta
-            </button>
+            </Button>
           </div>
         ))}
       </div>

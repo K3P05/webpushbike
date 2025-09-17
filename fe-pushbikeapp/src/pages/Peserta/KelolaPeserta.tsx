@@ -3,15 +3,30 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import api from "@/services/api";
+import Button from "@/component/ui/Buttons";
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardContent,
+} from "@/component/ui/Card";
+import {
+  Table,
+  TableHeader,
+  TableRow,
+  TableHead,
+  TableBody,
+  TableCell,
+} from "@/component/ui/Table";
 
 type Peserta = {
   id_pendaftaran: number;
   nama: string;
   kategori: string;
-  platNumber: string; 
+  platNumber: string;
   community: string;
   id_lomba: number;
-  statusPembayaran: boolean; // ✅ tambahkan
+  statusPembayaran: boolean;
 };
 
 export default function KelolaPeserta() {
@@ -24,7 +39,6 @@ export default function KelolaPeserta() {
     try {
       const res = await api.get(`/lomba/${id}/peserta`);
       const semuaPeserta: Peserta[] = res.data ?? [];
-      // ✅ hanya ambil peserta yang sudah bayar
       const pesertaLunas = semuaPeserta.filter((p) => p.statusPembayaran === true);
       setPesertaList(pesertaLunas);
     } catch (err) {
@@ -39,77 +53,89 @@ export default function KelolaPeserta() {
   }, [id]);
 
   return (
-    <div className="min-h-screen bg-[#222831] font-poppins px-6 py-12">
+    <div className="font-poppins px-6 py-10">
       {/* Header */}
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold text-[#EEEEEE]">Kelola Peserta</h1>
-        <button
+        <h1 className="text-2xl font-bold text-text-light">Kelola Peserta</h1>
+        <Button
+          variant="secondary"
           onClick={() => navigate("/admindashboard/kelolalomba")}
-          className="px-4 py-2 bg-[#00ADB5] text-[#222831] font-medium rounded-lg hover:bg-[#00bfc8] transition"
         >
           Kembali
-        </button>
+        </Button>
       </div>
 
       {/* Content */}
       {loading ? (
-        <p className="text-[#EEEEEE]/70">Loading data peserta...</p>
+        <p className="text-text-light/70">Loading data peserta...</p>
       ) : pesertaList.length === 0 ? (
-        <p className="text-[#EEEEEE]/70">Belum ada peserta yang sudah membayar untuk lomba ini.</p>
+        <p className="text-text-light/70">
+          Belum ada peserta yang sudah membayar untuk lomba ini.
+        </p>
       ) : (
-        <div className="overflow-x-auto">
-          {/* Table */}
-          <table className="min-w-full border border-[#EEEEEE]/20 text-[#EEEEEE] text-sm rounded-lg overflow-hidden">
-            <thead className="bg-[#00ADB5] text-[#222831]">
-              <tr>
-                <th className="px-3 py-2 text-left">ID</th>
-                <th className="px-3 py-2 text-left">Nama</th>
-                <th className="px-3 py-2 text-left">Kategori</th>
-                <th className="px-3 py-2 text-left">Plat Number</th>
-                <th className="px-3 py-2 text-left">Community</th>
-              </tr>
-            </thead>
-            <tbody>
-              {pesertaList.map((p, idx) => (
-                <tr
-                  key={p.id_pendaftaran}
-                  className="border-t border-[#EEEEEE]/20 hover:bg-[#00ADB5]/20"
-                >
-                  {/* ID urut mulai dari 1 */}
-                  <td className="px-3 py-2">{idx + 1}</td>
-                  <td className="px-3 py-2">{p.nama}</td>
-                  <td className="px-3 py-2">{p.kategori}</td>
-                  <td className="px-3 py-2">{p.platNumber}</td>
-                  <td className="px-3 py-2">{p.community}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-accent">Daftar Peserta</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow className="bg-base-mid text-text-light">
+                    <TableHead>No</TableHead>
+                    <TableHead>Nama</TableHead>
+                    <TableHead>Kategori</TableHead>
+                    <TableHead>Plat Number</TableHead>
+                    <TableHead>Community</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {pesertaList.map((p, idx) => (
+                    <TableRow
+                      key={p.id_pendaftaran}
+                      className="border-t border-border-accent hover:bg-accent/10"
+                    >
+                      <TableCell>{idx + 1}</TableCell>
+                      <TableCell>{p.nama}</TableCell>
+                      <TableCell>
+                        <span
+                          className={`px-2 py-0.5 rounded-full text-xs font-medium
+                            ${
+                              p.kategori === "boy"
+                                ? "bg-kategori-boy-bg/30 text-kategori-boy-text"
+                                : p.kategori === "girl"
+                                ? "bg-kategori-girl-bg/30 text-kategori-girl-text"
+                                : "bg-gray-500/20 text-gray-400"
+                            }`}
+                        >
+                          {p.kategori}
+                        </span>
+                      </TableCell>
+                      <TableCell>{p.platNumber}</TableCell>
+                      <TableCell>{p.community}</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
 
-          {/* Button Olah Data */}
-          {!loading && pesertaList.length > 0 && (
-            <div className="mt-6 flex justify-end">
-              <button
+            {/* Action Buttons */}
+            <div className="mt-6 flex justify-end gap-3">
+              <Button
                 onClick={() => navigate(`/admindashboard/olahdatapeserta/${id}`)}
-                className="px-6 py-2 bg-[#00ADB5] text-[#222831] font-medium rounded-lg hover:bg-[#00bfc8] transition"
+                className="bg-accent text-base-dark hover:bg-accent-hover"
               >
                 Olah Data
-              </button>
-            </div>
-          )}
-          {/* Button Acak Peserta */}
-          {!loading && pesertaList.length > 0 && (
-            <div className="mt-4 flex justify-end gap-4">
-              <button
+              </Button>
+              <Button
+                variant="success"
                 onClick={() => navigate(`/admindashboard/acakpeserta/${id}`)}
-                className="px-6 py-2 bg-green-500 text-[#222831] font-medium rounded-lg hover:bg-green-600 transition"
               >
                 Acak Peserta
-              </button>
+              </Button>
             </div>
-          )}
-
-        </div>
+          </CardContent>
+        </Card>
       )}
     </div>
   );

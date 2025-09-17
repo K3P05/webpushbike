@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import LombaForm from "./LombaForm";
 import type { UserType } from "@/types/users";
+import Buttons from "@/component/ui/Buttons";
 
 export default function TambahLomba() {
   const [formData, setFormData] = useState<any | null>(null);
@@ -65,56 +66,57 @@ export default function TambahLomba() {
   };
 
   return (
-    <div className="min-h-screen bg-[#222831] p-6 flex items-start justify-center font-poppins">
-      <div className="bg-[#EEEEEE] shadow-lg rounded-xl p-6 w-full max-w-5xl">
+    <div className="min-h-screen p-6 flex items-start justify-center font-poppins">
+      <div className="bg-[#1b252f] shadow-xl rounded-2xl p-6 w-full max-w-5xl border border-[#293241]">
         {!formData ? (
           <LombaForm onSubmit={handleFormSubmit} />
         ) : (
           <div>
-            <h2 className="text-2xl font-bold mb-6 text-center text-[#222831]">
+            <h2 className="text-2xl font-bold mb-6 text-center text-[#EEEEEE]">
               🏁 {formData.nama} ({formData.kategori}) - {formData.tanggal}
             </h2>
 
-            <div className="flex gap-3 justify-center mb-6">
-              <button
-                className="px-4 py-2 bg-[#393E46] text-[#EEEEEE] rounded-lg hover:bg-[#222831] transition"
-                onClick={() => setShowPesertaForm(true)}
-              >
-                Input Peserta
-              </button>
-              <button
-                className="px-4 py-2 bg-[#00ADB5] text-[#EEEEEE] rounded-lg hover:bg-[#0099a3] transition"
-                onClick={handleTambahkanLomba}
-              >
-                Tambahkan Lomba
-              </button>
-            </div>
+              <div className="flex gap-3 justify-center mb-6">
+                <Buttons 
+                  variant="secondary"
+                  onClick={() => setShowPesertaForm(true)}
+                >
+                  Input Peserta
+                </Buttons>
+
+                <Buttons 
+                  variant="primary"
+                  onClick={handleTambahkanLomba}
+                >
+                  Tambahkan Lomba
+                </Buttons>
+              </div>
 
             {batches.map((pesertaBatch, batchIdx) => (
               <div key={batchIdx} className="mb-8">
                 {batches.length > 1 && (
-                  <h3 className="text-lg font-semibold mb-3 text-[#222831]">
+                  <h3 className="text-lg font-semibold mb-3 text-[#EEEEEE]">
                     Batch {batchIdx + 1}
                   </h3>
                 )}
-                <div className="overflow-x-auto rounded-lg shadow border border-[#393E46]">
-                  <table className="min-w-full text-sm text-left text-[#222831]">
-                    <thead className="bg-[#393E46] text-[#EEEEEE] uppercase">
+                <div className="overflow-x-auto rounded-lg shadow border border-[#293241]">
+                  <table className="min-w-full text-sm text-left text-[#EEEEEE]">
+                    <thead className="bg-[#293241] text-[#EEEEEE] uppercase">
                       <tr>
-                        <th className="px-4 py-3 border border-[#222831]">Nama Peserta</th>
-                        <th className="px-4 py-3 border border-[#222831]">No Plat</th>
-                        <th className="px-4 py-3 border border-[#222831]">Asal Komunitas</th>
-                        <th className="px-4 py-3 border border-[#222831] text-center">Point 1</th>
-                        <th className="px-4 py-3 border border-[#222831] text-center">Point 2</th>
+                        <th className="px-4 py-3 border border-[#374151]">Nama Peserta</th>
+                        <th className="px-4 py-3 border border-[#374151]">No Plat</th>
+                        <th className="px-4 py-3 border border-[#374151]">Asal Komunitas</th>
+                        <th className="px-4 py-3 border border-[#374151] text-center">Point 1</th>
+                        <th className="px-4 py-3 border border-[#374151] text-center">Point 2</th>
                       </tr>
                     </thead>
                     <tbody>
                       {pesertaBatch.map((u) => (
                         <tr
                           key={u.id_pendaftaran}
-                          className="odd:bg-[#EEEEEE] even:bg-[#f5f5f5] hover:bg-[#d9f9fa] transition"
+                          className="odd:bg-[#1b252f] even:bg-[#222f3e] hover:bg-[#2d3f50] transition-all"
                         >
-                          <td className="px-4 py-2 border border-[#393E46]">
+                          <td className="px-4 py-2 border border-[#374151]">
                             {showPesertaForm ? (
                               <input
                                 type="text"
@@ -127,13 +129,13 @@ export default function TambahLomba() {
                                     e.target.value
                                   )
                                 }
-                                className="border border-[#393E46] rounded px-2 py-1 w-full focus:outline-none focus:ring-2 focus:ring-[#00ADB5]"
+                                className="border border-[#374151] rounded-lg px-2 py-1 w-full bg-[#0f172a] text-[#EEEEEE] focus:outline-none focus:ring-2 focus:ring-[#00ADB5]"
                               />
                             ) : (
                               u.nama
                             )}
                           </td>
-                          <td className="px-4 py-2 border border-[#393E46]">
+                          <td className="px-4 py-2 border border-[#374151]">
                             {showPesertaForm ? (
                               <input
                                 type="text"
@@ -146,13 +148,13 @@ export default function TambahLomba() {
                                     e.target.value
                                   )
                                 }
-                                className="border border-[#393E46] rounded px-2 py-1 w-full focus:outline-none focus:ring-2 focus:ring-[#00ADB5]"
+                                className="border border-[#374151] rounded-lg px-2 py-1 w-full bg-[#0f172a] text-[#EEEEEE] focus:outline-none focus:ring-2 focus:ring-[#00ADB5]"
                               />
                             ) : (
                               u.plat_number
                             )}
                           </td>
-                          <td className="px-4 py-2 border border-[#393E46]">
+                          <td className="px-4 py-2 border border-[#374151]">
                             {showPesertaForm ? (
                               <input
                                 type="text"
@@ -165,13 +167,13 @@ export default function TambahLomba() {
                                     e.target.value
                                   )
                                 }
-                                className="border border-[#393E46] rounded px-2 py-1 w-full focus:outline-none focus:ring-2 focus:ring-[#00ADB5]"
+                                className="border border-[#374151] rounded-lg px-2 py-1 w-full bg-[#0f172a] text-[#EEEEEE] focus:outline-none focus:ring-2 focus:ring-[#00ADB5]"
                               />
                             ) : (
                               u.community
                             )}
                           </td>
-                          <td className="px-4 py-2 border border-[#393E46] text-center">
+                          <td className="px-4 py-2 border border-[#374151] text-center">
                             {showPesertaForm ? (
                               <input
                                 type="number"
@@ -184,13 +186,13 @@ export default function TambahLomba() {
                                     Number(e.target.value)
                                   )
                                 }
-                                className="border border-[#393E46] rounded px-2 py-1 w-full text-center focus:outline-none focus:ring-2 focus:ring-[#00ADB5]"
+                                className="border border-[#374151] rounded-lg px-2 py-1 w-full text-center bg-[#0f172a] text-[#EEEEEE] focus:outline-none focus:ring-2 focus:ring-[#00ADB5]"
                               />
                             ) : (
                               u.point1
                             )}
                           </td>
-                          <td className="px-4 py-2 border border-[#393E46] text-center">
+                          <td className="px-4 py-2 border border-[#374151] text-center">
                             {showPesertaForm ? (
                               <input
                                 type="number"
@@ -203,7 +205,7 @@ export default function TambahLomba() {
                                     Number(e.target.value)
                                   )
                                 }
-                                className="border border-[#393E46] rounded px-2 py-1 w-full text-center focus:outline-none focus:ring-2 focus:ring-[#00ADB5]"
+                                className="border border-[#374151] rounded-lg px-2 py-1 w-full text-center bg-[#0f172a] text-[#EEEEEE] focus:outline-none focus:ring-2 focus:ring-[#00ADB5]"
                               />
                             ) : (
                               u.point2
