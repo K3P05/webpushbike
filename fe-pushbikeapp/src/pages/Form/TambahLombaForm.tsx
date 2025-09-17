@@ -1,174 +1,138 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-// src/components/admin/TambahLombaModal.tsx
+// src/pages/Form/TambahLombaForm.tsx
 import { useState } from "react";
-import { createLomba, type Kategori } from "@/services/lomba";
+import { Card } from "@/component/ui/Card";
+import Input from "@/component/ui/Input";
+import Buttons from "@/component/ui/Buttons";
 
-interface TambahLombaModalProps {
-  onClose: () => void;
-  onSuccess: () => void;
-}
-
-export default function TambahLombaModal({ onClose, onSuccess }: TambahLombaModalProps) {
-  const [form, setForm] = useState<{
+type LombaFormProps = {
+  onSubmit: (formData: {
     nama: string;
     tanggal: string;
-    jumlah_peserta: number;
-    biaya: number;
-    kategori: Kategori;
-    jumlah_batch: number; // tambahkan field ini
-  }>({
+    peserta: number;
+    batch: number;
+    harga: number;
+    kategori: string;
+  }) => void;
+  onClose: () => void;
+};
+
+export default function TambahLombaForm({ onSubmit, onClose }: LombaFormProps) {
+  const [formData, setFormData] = useState({
     nama: "",
     tanggal: "",
-    jumlah_peserta: 1,
-    biaya: 0,
-    kategori: "boy", // default harus sesuai enum
-    jumlah_batch: 1, // default 1
+    peserta: 1,
+    batch: 1,
+    harga: 0,
+    kategori: "Boy",
   });
 
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
     const { name, value } = e.target;
-    setForm({
-      ...form,
-      [name]: name === "kategori" ? (value as Kategori) : Number(value) || value,
-    });
+    setFormData((prev) => ({
+      ...prev,
+      [name]:
+        name === "peserta" || name === "batch" || name === "harga"
+          ? Number(value)
+          : value,
+    }));
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
-    setError("");
-
-    try {
-      await createLomba({
-        nama: form.nama,
-        tanggal: form.tanggal,
-        jumlahPeserta: Number(form.jumlah_peserta),
-        biaya: Number(form.biaya),
-        kategori: form.kategori,
-        jumlahBatch: Number(form.jumlah_batch), // kirim ke backend
-      });
-
-      onSuccess();
-      alert("Data lomba berhasil disimpan!")
-      onClose();
-    } catch (err: any) {
-      console.error("Gagal tambah lomba:", err);
-      setError(err?.response?.data?.message || "Gagal tambah lomba");
-    } finally {
-      setLoading(false);
-    }
+    onSubmit(formData);
   };
 
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-50">
-      <div className="bg-[#393E46] text-[#EEEEEE] rounded-2xl shadow-xl w-full max-w-md p-6">
-        <h2 className="text-2xl font-bold mb-4 border-b border-[#00ADB5] pb-2 text-center">
-          Tambah Lomba
-        </h2>
-
-        {error && (
-          <p className="text-red-500 text-sm mb-2">{Array.isArray(error) ? error.join(", ") : error}</p>
-        )}
-
-        <form onSubmit={handleSubmit} className="space-y-3">
+      <Card className="bg-base-card text-text-light rounded-2xl shadow-xl w-full max-w-md p-6 animate-scale-in">
+        <h2 className="text-center text-xl font-semibold mb-4">Tambah Lomba</h2>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          {/* Nama Lomba */}
           <div>
-            <label className="block mb-1 font-medium">Nama Lomba</label>
-            <input
+            <label className="block mb-1 text-sm">Nama Lomba</label>
+            <Input
               type="text"
               name="nama"
-              value={form.nama}
+              value={formData.nama}
               onChange={handleChange}
-              className="w-full p-2 rounded-lg bg-[#222831] text-[#EEEEEE] border border-[#00ADB5] focus:outline-none focus:ring-2 focus:ring-[#00ADB5]"
-              required
+              placeholder="Nama Lomba"
             />
           </div>
 
+          {/* Tanggal */}
           <div>
-            <label className="block mb-1 font-medium">Tanggal</label>
-            <input
+            <label className="block mb-1 text-sm">Tanggal</label>
+            <Input
               type="date"
               name="tanggal"
-              value={form.tanggal}
+              value={formData.tanggal}
               onChange={handleChange}
-              className="w-full p-2 rounded-lg bg-[#222831] text-[#EEEEEE] border border-[#00ADB5] focus:outline-none focus:ring-2 focus:ring-[#00ADB5]"
-              required
             />
           </div>
 
+          {/* Jumlah Peserta */}
           <div>
-            <label className="block mb-1 font-medium">Jumlah Peserta</label>
-            <input
+            <label className="block mb-1 text-sm">Jumlah Peserta</label>
+            <Input
               type="number"
-              name="jumlah_peserta"
-              value={form.jumlah_peserta}
+              name="peserta"
+              min="1"
+              value={formData.peserta}
               onChange={handleChange}
-              min={1}
-              className="w-full p-2 rounded-lg bg-[#222831] text-[#EEEEEE] border border-[#00ADB5] focus:outline-none focus:ring-2 focus:ring-[#00ADB5]"
-              required
             />
           </div>
 
+          {/* Jumlah Batch */}
           <div>
-            <label className="block mb-1 font-medium">Jumlah Batch</label>
-            <input
+            <label className="block mb-1 text-sm">Jumlah Batch</label>
+            <Input
               type="number"
-              name="jumlah_batch"
-              value={form.jumlah_batch}
+              name="batch"
+              min="1"
+              value={formData.batch}
               onChange={handleChange}
-              min={1}
-              className="w-full p-2 rounded-lg bg-[#222831] text-[#EEEEEE] border border-[#00ADB5] focus:outline-none focus:ring-2 focus:ring-[#00ADB5]"
-              required
             />
           </div>
 
+          {/* Harga */}
           <div>
-            <label className="block mb-1 font-medium">Harga Pendaftaran (Rp)</label>
-            <input
+            <label className="block mb-1 text-sm">Harga Pendaftaran (Rp)</label>
+            <Input
               type="number"
-              name="biaya"
-              value={form.biaya}
+              name="harga"
+              min="0"
+              value={formData.harga}
               onChange={handleChange}
-              min={0}
-              className="w-full p-2 rounded-lg bg-[#222831] text-[#EEEEEE] border border-[#00ADB5] focus:outline-none focus:ring-2 focus:ring-[#00ADB5]"
-              required
             />
           </div>
 
+          {/* Kategori */}
           <div>
-            <label className="block mb-1 font-medium">Kategori</label>
+            <label className="block mb-1 text-sm">Kategori</label>
             <select
               name="kategori"
-              value={form.kategori}
+              value={formData.kategori}
               onChange={handleChange}
-              className="w-full p-2 rounded-lg bg-[#222831] text-[#EEEEEE] border border-[#00ADB5] focus:outline-none focus:ring-2 focus:ring-[#00ADB5]"
+              className="w-full rounded-lg border border-[#00ADB5] bg-transparent p-2 focus:outline-none focus:ring-2 focus:ring-[#00ADB5]"
             >
-              <option value="boy">Boy</option>
-              <option value="girl">Girl</option>
+              <option value="Boy">Boy</option>
+              <option value="Girl">Girl</option>
             </select>
           </div>
 
-          <div className="flex justify-end gap-2 mt-4">
-            <button
-              type="button"
-              onClick={onClose}
-              className="px-4 py-2 rounded-lg bg-gray-600 hover:bg-gray-700"
-              disabled={loading}
-            >
+          {/* Tombol */}
+          <div className="flex justify-end gap-2 pt-2">
+            <Buttons type="button" variant="secondary" onClick={onClose}>
               Batal
-            </button>
-            <button
-              type="submit"
-              className="px-4 py-2 rounded-lg bg-[#00ADB5] hover:bg-[#00ADB5]/80 text-[#EEEEEE]"
-              disabled={loading}
-            >
-              {loading ? "Menyimpan..." : "Simpan"}
-            </button>
+            </Buttons>
+            <Buttons type="submit" variant="primary">
+              Simpan
+            </Buttons>
           </div>
         </form>
-      </div>
+      </Card>
     </div>
   );
 }

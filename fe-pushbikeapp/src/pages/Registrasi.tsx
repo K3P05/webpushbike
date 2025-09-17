@@ -3,6 +3,8 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "@/services/api";
+import { Card, CardHeader, CardTitle, CardContent } from "@/component/ui/Card";
+import Button from "@/component/ui/Buttons";
 
 type Kategori = "boy" | "girl";
 
@@ -24,7 +26,7 @@ export default function Registrasi() {
     nama: "",
     plat_number: "",
     community: "",
-    no_hp : "",
+    no_hp: "",
     metodePembayaran: "transfer",
   });
 
@@ -41,7 +43,9 @@ export default function Registrasi() {
     fetchLomba();
   }, []);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
@@ -56,19 +60,23 @@ export default function Registrasi() {
 
     try {
       await api.post(`/lomba/${selectedLomba.id}/peserta`, {
-        nama: formData.nama,
-        plat_number: formData.plat_number,
-        community: formData.community,
-        no_hp: formData.no_hp,
-        metodePembayaran: formData.metodePembayaran,
+        ...formData,
         kategori: selectedLomba.kategori,
       });
 
-      alert(`✅ Pendaftaran berhasil! Anda telah terdaftar di lomba "${selectedLomba.nama}".`);
+      alert(
+        `✅ Pendaftaran berhasil! Anda telah terdaftar di lomba "${selectedLomba.nama}".`
+      );
 
       await fetchLomba();
       setSelectedLomba(null);
-      setFormData({ nama: "", plat_number: "", community: "", no_hp: "", metodePembayaran: "transfer" });
+      setFormData({
+        nama: "",
+        plat_number: "",
+        community: "",
+        no_hp: "",
+        metodePembayaran: "transfer",
+      });
 
       navigate("/");
     } catch (err: any) {
@@ -78,71 +86,67 @@ export default function Registrasi() {
   };
 
   return (
-    <div className="p-6 max-w-3xl mx-auto bg-[#222831] min-h-screen font-poppins">
-      <h1 className="text-3xl font-bold text-[#00ADB5] mb-6 text-center">
+    <div className="p-6 max-w-3xl mx-auto min-h-screen font-poppins">
+      <h1 className="text-3xl font-bold text-accent mb-6 text-center">
         Pilih Lomba untuk Daftar 🚴
       </h1>
 
       {/* Daftar Lomba */}
-      <div className="flex flex-col gap-4">
+      <div className="grid gap-4">
         {lombaList.map((lomba) => (
-          <div
+          <Card
             key={lomba.id}
-            className="bg-[#393E46] shadow-lg rounded-xl p-4 flex flex-col justify-between hover:shadow-xl transition"
+            className="bg-base-card border-none text-text-light hover:shadow-lg transition"
           >
-            <div>
-              <h2 className="text-lg font-semibold text-[#EEEEEE]">{lomba.nama}</h2>
+            <CardHeader>
+              <CardTitle className="text-lg">{lomba.nama}</CardTitle>
               <p className="text-gray-300 text-sm">
                 {new Date(lomba.tanggal).toLocaleDateString()}
               </p>
-              {lomba.kategori && (
-                <p className="mt-1 font-semibold">
-                  Kategori:{" "}
-                  <span
-                    className={
-                      lomba.kategori === "boy"
-                        ? "text-blue-400"
-                        : "text-pink-400"
-                    }
-                  >
-                    {lomba.kategori}
-                  </span>
-                </p>
-              )}
-            </div>
-
-            <button
-              onClick={() => setSelectedLomba(lomba)}
-              className="mt-4 w-full bg-blue-400 hover:bg-blue-600 text-[#EEEEEE] font-semibold px-2 py-1 rounded-lg shadow transition"
-            >
-              Daftar
-            </button>
-          </div>
+              <span
+                className={`mt-2 inline-block px-3 py-1 rounded-full text-xs font-semibold ${
+                  lomba.kategori === "boy"
+                    ? "bg-blue-500/20 text-blue-400"
+                    : "bg-pink-500/20 text-pink-400"
+                }`}
+              >
+                {lomba.kategori}
+              </span>
+            </CardHeader>
+            <CardContent>
+              <Button
+                onClick={() => setSelectedLomba(lomba)}
+                className="w-full bg-accent hover:bg-accent-hover"
+              >
+                Daftar
+              </Button>
+            </CardContent>
+          </Card>
         ))}
       </div>
 
-      {/* Modal Registrasi */}
+      {/* Modal Registrasi manual */}
       {selectedLomba && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-          <div className="bg-[#393E46] rounded-2xl shadow-lg w-full max-w-md p-6 relative">
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-base-card text-text-light rounded-2xl shadow-lg w-full max-w-md p-6 relative">
             <button
-              className="absolute top-3 right-3 text-[#EEEEEE] hover:text-[#00ADB5] transition"
+              className="absolute top-3 right-3 text-text-light hover:text-accent transition"
               onClick={() => setSelectedLomba(null)}
             >
               ✖
             </button>
 
-            <h2 className="text-2xl font-bold mb-6 text-center text-[#00ADB5]">
+            <h2 className="text-2xl font-bold mb-6 text-center text-accent">
               Registrasi {selectedLomba.nama}
             </h2>
 
-            <p className="text-[#EEEEEE]/80 mb-2 text-center">
+            <p className="text-text-light/80 mb-2 text-center">
               Biaya pendaftaran:{" "}
-              <span className="text-[#00ADB5] font-semibold">
+              <span className="text-accent font-semibold">
                 Rp {selectedLomba.biaya.toLocaleString()}
               </span>
             </p>
-            <p className="text-[#EEEEEE]/80 mb-4 text-center">
+            <p className="text-text-light/80 mb-4 text-center">
               Kategori lomba:{" "}
               <span
                 className={
@@ -155,69 +159,36 @@ export default function Registrasi() {
               </span>
             </p>
 
-            <form onSubmit={handleSubmit}>
-              <div className="mb-4">
-                <label className="block text-[#EEEEEE] font-medium">Nama</label>
-                <input
-                  type="text"
-                  name="nama"
-                  value={formData.nama}
-                  onChange={handleChange}
-                  className="w-full mt-1 p-2 bg-[#222831] text-[#EEEEEE] border border-[#00ADB5] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#00ADB5]"
-                  required
-                />
-              </div>
+            <form onSubmit={handleSubmit} className="space-y-4">
+              {["nama", "plat_number", "community", "no_hp"].map((field) => (
+                <div key={field}>
+                  <label className="block text-sm font-medium capitalize">
+                    {field.replace("_", " ")}
+                  </label>
+                  <input
+                    type="text"
+                    name={field}
+                    value={(formData as any)[field]}
+                    onChange={handleChange}
+                    className="w-full mt-1 p-2 bg-base-dark text-text-light border border-accent rounded-lg focus:outline-none focus:ring-2 focus:ring-accent"
+                    required
+                  />
+                </div>
+              ))}
 
-              <div className="mb-4">
-                <label className="block text-[#EEEEEE] font-medium">Plat Number</label>
-                <input
-                  type="text"
-                  name="plat_number"
-                  value={formData.plat_number}
-                  onChange={handleChange}
-                  className="w-full mt-1 p-2 bg-[#222831] text-[#EEEEEE] border border-[#00ADB5] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#00ADB5]"
-                  required
-                />
-              </div>
-
-              <div className="mb-4">
-                <label className="block text-[#EEEEEE] font-medium">Community</label>
-                <input
-                  type="text"
-                  name="community"
-                  value={formData.community}
-                  onChange={handleChange}
-                  className="w-full mt-1 p-2 bg-[#222831] text-[#EEEEEE] border border-[#00ADB5] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#00ADB5]"
-                  required
-                />
-              </div>
-
-              <div className="mb-4">
-              <label className="block text-[#EEEEEE] font-medium">No HP</label>
-              <input
-                type="text"
-                name="no_hp"
-                value={formData.no_hp || ""}
-                onChange={handleChange}
-                className="w-full mt-1 p-2 bg-[#222831] text-[#EEEEEE] border border-[#00ADB5] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#00ADB5]"
-                required
-              />
-            </div>
-
-
-              <div className="mb-6">
-                <p className="text-[#EEEEEE] font-medium">Metode Pembayaran</p>
-                <p className="text-[#00ADB5] mt-2 font-semibold">
+              <div>
+                <p className="text-sm font-medium">Metode Pembayaran</p>
+                <p className="text-accent mt-2 font-semibold text-sm">
                   Transfer Bank: BCA 1234567890 a.n Panitia PushBike
                 </p>
               </div>
 
-              <button
+              <Button
                 type="submit"
-                className="w-full bg-blue-400 hover:bg-blue-600 text-[#EEEEEE] font-semibold p-3 rounded-lg shadow-md transition"
+                className="w-full bg-accent hover:bg-accent-hover"
               >
                 Daftar
-              </button>
+              </Button>
             </form>
           </div>
         </div>

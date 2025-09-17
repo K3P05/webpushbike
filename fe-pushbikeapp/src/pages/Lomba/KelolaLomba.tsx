@@ -2,6 +2,8 @@
 import { useEffect, useState } from "react";
 import api from "@/services/api";
 import { useNavigate } from "react-router-dom";
+import { Card, CardContent, CardHeader } from "@/component/ui/Card";
+import Buttons from "@/component/ui/Buttons";
 
 interface Lomba {
   id: number;
@@ -28,30 +30,41 @@ export default function KelolaLomba() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-[#222831] font-poppins px-6 py-12">
-      <h1 className="text-2xl font-bold mb-6 text-[#EEEEEE]">Kelola Data Lomba</h1>
+    <div className="min-h-screen font-poppins px-6 py-12">
+      <h1 className="text-3xl font-bold mb-8 text-text-light">
+        Kelola Data Lomba
+      </h1>
 
       {lombaList.length === 0 ? (
-        <p className="text-[#EEEEEE]/70">Belum ada lomba yang dibuat.</p>
+        <p className="text-text-light/70">Belum ada lomba yang dibuat.</p>
       ) : (
-        <div className="space-y-4">
+        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {lombaList.map((lomba) => (
-            <div
-              key={lomba.id}
-              className="bg-[#393E46] p-4 rounded-xl shadow flex justify-between items-center"
-            >
-              <div>
-                <h2 className="text-lg font-semibold text-[#00ADB5]">{lomba.nama}</h2>
-                <p className="text-[#EEEEEE]/70 text-sm">Kategori: {lomba.kategori}</p>
-                <p className="text-[#EEEEEE]/70 text-sm">Jumlah Peserta: {lomba.jumlahPeserta}</p>
-              </div>
-              <button
-                onClick={() => navigate(`/admindashboard/kelolapeserta/${lomba.id}`)}
-                className="px-4 py-2 bg-[#00ADB5] text-[#222831] font-medium rounded-lg hover:bg-[#00bfc8] transition"
-              >
-                Kelola
-              </button>
-            </div>
+            <Card key={lomba.id} className="flex flex-col justify-between">
+              <CardHeader>
+                <h2 className="text-xl font-semibold text-accent">
+                  {lomba.nama}
+                </h2>
+              </CardHeader>
+              <CardContent>
+                <p className="text-text-light/80 text-sm mb-1">
+                  Kategori: {lomba.kategori}
+                </p>
+                <p className="text-text-light/80 text-sm mb-4">
+                  Jumlah Peserta: {lomba.jumlahPeserta}
+                </p>
+
+                <Buttons
+                  variant="primary"
+                  className="w-full"
+                  onClick={() =>
+                    navigate(`/admindashboard/kelolapeserta/${lomba.id}`)
+                  }
+                >
+                  Kelola
+                </Buttons>
+              </CardContent>
+            </Card>
           ))}
         </div>
       )}

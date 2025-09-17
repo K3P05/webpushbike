@@ -8,111 +8,165 @@ export default function Header() {
   const toggleMenu = () => setMenuOpen(!menuOpen);
   const location = useLocation();
 
-  // cek apakah sedang di halaman login admin
-  const isLoginPage = location.pathname === "/admindashboard";
+  // cek halaman admin
+  const isAdminPage = location.pathname.startsWith("/admindashboard");
+
+  const isActive = (path: string) =>
+    location.pathname === path || location.pathname.startsWith(path + "/");
+
+  // menu publik
+  const menuItems = [
+    { name: "Registrasi", path: "/registrasi" },
+    { name: "Hasil Live", path: "/listhasil" },
+    { name: "Kontak", path: "/kontak" },
+  ];
+
+  // menu admin
+  const adminMenuItems = [
+    { name: "Logout", path: "/logout", danger: true },
+  ];
 
   return (
-    <header className="w-full bg-[#222831] shadow-md border-b border-[#393E46] sticky top-0 z-50 font-poppins">
+    <header className="w-full bg-gradient-to-r from-[#0f2027] via-[#203a43] to-[#2c5364] shadow-md border-b border-accent sticky top-0 z-50 font-poppins">
       <div className="max-w-7xl mx-auto flex justify-between items-center px-6 py-4">
         {/* Logo */}
-        <Link to="/dashboard" className="flex items-center space-x-2">
-          <img src={logo} alt="PushBike Logo" className="h-16 w-auto" />
-          <span className="font-bold text-[#EEEEEE] text-xl tracking-wide">
+        <Link
+          to={isAdminPage ? "/admindashboard" : "/dashboard"}
+          className="flex items-center space-x-2 group"
+        >
+          <img src={logo} alt="PushBike Logo" className="h-14 w-auto" />
+          <span className="font-bold text-text-light text-xl tracking-wide group-hover:text-accent transition-colors">
             PushBike Race
           </span>
         </Link>
 
-        {/* Navbar Desktop */}
-        {!isLoginPage && (
-          <nav className="hidden md:flex">
-            <ul className="flex space-x-6 text-[#EEEEEE] font-medium items-center">
-              <li>
-                <Link
-                  to="/registrasi"
-                  className="hover:text-[#00ADB5] transition"
-                >
-                  Registrasi
-                </Link>
-              </li>
-              <li>
-                <Link
-                  to="/listhasil"
-                  className="hover:text-[#00ADB5] transition"
-                >
-                  Hasil Live
-                </Link>
-              </li>
-              <li>
-                <Link
-                  to="/kontak"
-                  className="hover:text-[#00ADB5] transition"
-                >
-                  Kontak
-                </Link>
-              </li>
+        {/* Desktop Navbar */}
+        <nav className="hidden md:flex">
+          <ul className="flex space-x-6 text-text-light font-medium items-center">
+            {!isAdminPage
+              ? // menu publik
+                menuItems.map((item) => {
+                  const active = isActive(item.path);
+                  return (
+                    <li key={item.path} className="group relative">
+                      <Link
+                        to={item.path}
+                        className={`pb-1 transition-colors duration-200 ${
+                          active ? "text-accent" : "hover:text-accent"
+                        }`}
+                      >
+                        {item.name}
+                      </Link>
+                      <span
+                        className={`absolute left-0 -bottom-0.5 h-0.5 bg-accent transition-all duration-300 ${
+                          active ? "w-full" : "w-0 group-hover:w-full"
+                        }`}
+                      />
+                    </li>
+                  );
+                })
+              : // menu admin
+                adminMenuItems.map((item) => {
+                  const active = isActive(item.path);
+                  return (
+                    <li key={item.path}>
+                      <Link
+                        to={item.path}
+                        className={`pb-1 transition-colors duration-200 ${
+                          active
+                            ? "text-accent"
+                            : item.danger
+                            ? "text-red-400 hover:text-red-500"
+                            : "hover:text-accent"
+                        }`}
+                      >
+                        {item.name}
+                      </Link>
+                    </li>
+                  );
+                })}
+
+            {/* Tombol login admin cuma di menu publik */}
+            {!isAdminPage && (
               <li>
                 <Link
                   to="/loginadmin"
-                  className="px-4 py-2 bg-[#00ADB5] text-[#EEEEEE] rounded-lg hover:bg-[#393E46] transition"
+                  className="px-4 py-2 bg-accent text-white rounded-lg hover:bg-accent-hover transition"
                 >
                   Login Admin
                 </Link>
               </li>
-            </ul>
-          </nav>
-        )}
+            )}
+          </ul>
+        </nav>
 
         {/* Mobile Toggle */}
-        {!isLoginPage && (
-          <button
-            onClick={toggleMenu}
-            className="md:hidden text-2xl text-[#EEEEEE] focus:outline-none"
-          >
-            {menuOpen ? <FiX /> : <FiMenu />}
-          </button>
-        )}
+        <button
+          onClick={toggleMenu}
+          className="md:hidden text-2xl text-text-light focus:outline-none"
+        >
+          {menuOpen ? <FiX /> : <FiMenu />}
+        </button>
       </div>
 
-      {/* Navbar Mobile */}
-      {menuOpen && !isLoginPage && (
-        <nav className="md:hidden bg-[#222831] border-t border-[#393E46] shadow-md">
-          <ul className="flex flex-col space-y-4 p-6 text-[#EEEEEE] font-medium">
-            <li>
-              <Link
-                to="/registrasi"
-                onClick={toggleMenu}
-                className="hover:text-[#00ADB5] transition"
-              >
-                Registrasi
-              </Link>
-            </li>
-            <li>
-              <Link
-                to="/listhasil"
-                onClick={toggleMenu}
-                className="hover:text-[#00ADB5] transition"
-              >
-                Hasil Live
-              </Link>
-            </li>
-            <li>
-              <Link
-                to="/kontak"
-                onClick={toggleMenu}
-                className="hover:text-[#00ADB5] transition"
-              >
-                Kontak
-              </Link>
-            </li>
-            <li>
-              <Link
-                to="/loginadmin"
-                onClick={toggleMenu}
-                className="block px-4 py-2 bg-[#00ADB5] text-[#EEEEEE] rounded-lg text-center hover:bg-[#393E46] transition"
-              >
-                Login Admin
-              </Link>
-            </li>
+      {/* Mobile Navbar */}
+      {menuOpen && (
+        <nav className="md:hidden bg-[#1e2d3a] border-t border-accent shadow-lg">
+          <ul className="flex flex-col space-y-3 p-6 text-text-light font-medium">
+            {!isAdminPage
+              ? // mobile menu publik
+                menuItems.map((item) => {
+                  const active = isActive(item.path);
+                  return (
+                    <li key={item.path}>
+                      <Link
+                        to={item.path}
+                        onClick={toggleMenu}
+                        className={`block w-full px-3 py-2 rounded-md transition ${
+                          active
+                            ? "text-accent bg-accent/10 border-l-4 border-accent"
+                            : "hover:text-accent hover:bg-white/5"
+                        }`}
+                      >
+                        {item.name}
+                      </Link>
+                    </li>
+                  );
+                })
+              : // mobile menu admin
+                adminMenuItems.map((item) => {
+                  const active = isActive(item.path);
+                  return (
+                    <li key={item.path}>
+                      <Link
+                        to={item.path}
+                        onClick={toggleMenu}
+                        className={`block w-full px-3 py-2 rounded-md transition ${
+                          active
+                            ? "text-accent bg-accent/10 border-l-4 border-accent"
+                            : item.danger
+                            ? "text-red-500 hover:text-red-400 hover:bg-red-500/10"
+                            : "hover:text-accent hover:bg-white/5"
+                        }`}
+                      >
+                        {item.name}
+                      </Link>
+                    </li>
+                  );
+                })}
+
+            {/* login admin cuma di menu publik */}
+            {!isAdminPage && (
+              <li>
+                <Link
+                  to="/loginadmin"
+                  onClick={toggleMenu}
+                  className="block px-4 py-2 bg-accent text-white rounded-lg text-center hover:bg-accent-hover transition"
+                >
+                  Login Admin
+                </Link>
+              </li>
+            )}
           </ul>
         </nav>
       )}

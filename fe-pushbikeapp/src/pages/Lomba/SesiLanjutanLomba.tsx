@@ -2,6 +2,17 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import api from "@/services/api";
+import {
+  Table,
+  TableHeader,
+  TableBody,
+  TableRow,
+  TableHead,
+  TableCell,
+} from "@/component/ui/Table";
+import { Card, CardHeader, CardContent } from "@/component/ui/Card";
+import Button from "@/component/ui/Buttons";
+import Input from "@/component/ui/Input";
 
 interface Peserta {
   pointSesi: any;
@@ -250,121 +261,124 @@ export default function PertandinganLanjutan() {
     }
   };
 
-  const renderMatchTable = (match: Peserta[], matchIndex: number, sesi: string) => (
-    <div key={`${sesi}-${matchIndex}`} className="bg-gray-800 p-4 rounded-lg mb-6">
-      <div className="flex items-center space-x-4 mb-2">
-        <h2 className="text-xl font-semibold text-cyan-400 hidden">
-          Match {matchIndex + 1} - {sesi}
-        </h2>
-        <input
-          type="text"
-          placeholder="Nama Match..."
-          className="p-1 rounded text-black"
-          value={matchNames[`${sesi}-${matchIndex}`] ?? ""} // ✅ pakai prefix sesi
-          onChange={(e) =>
-            setMatchNames((prev) => ({
-              ...prev,
-              [`${sesi}-${matchIndex}`]: e.target.value, // ✅ pakai prefix sesi
-            }))
-          }
-          onBlur={(e) => handleMatchNameChange(sesi, matchIndex, e.target.value)}
-        />
-      </div>
+    const renderMatchTable = (match: Peserta[], matchIndex: number, sesi: string) => (
+      <Card key={`${sesi}-${matchIndex}`} className="mb-6">
+        <CardHeader className="flex items-center space-x-4">
+          <h2 className="text-xl font-semibold text-accent hidden">
+            Match {matchIndex + 1} - {sesi}
+          </h2>
+          <Input
+            type="text"
+            placeholder="Nama Match..."
+            size="md"
+            value={matchNames[`${sesi}-${matchIndex}`] ?? ""}
+            onChange={(e) =>
+              handleMatchNameChange(sesi, matchIndex, e.target.value)
+            }
+          />
+        </CardHeader>
 
-      <table className="w-full border-collapse border border-gray-500 mt-2 text-white text-center">
-        <thead>
-          <tr>
-            <th className="border p-2 w-16">Gate</th>
-            <th className="border p-2 w-20">Finish</th>
-            <th className="border p-2 w-20">Plat</th>
-            <th className="border p-2 w-32">Nama Rider</th>
-            <th className="border p-2 w-32">Team</th>
-            {showPenalty && <th className="border p-2 w-24">Penalty</th>}
-          </tr>
-        </thead>
-        <tbody>
-          {match.map((p, idx) => (
-            <tr key={idx}>
-              <td className="border p-2 w-16">{idx + 1}</td>
-              <td className="border p-2 w-20">
-                <input
-                  type="number"
-                  className="w-full text-black p-1 rounded text-center"
-                  value={p.finish ?? ""}
-                  onChange={(e) =>
-                    handleFinishChange(
-                      sesi === "Utama" ? "Utama" : "Sekunder",
-                      matchIndex,
-                      idx,
-                      e.target.value
-                    )
-                  }
-                />
-              </td>
-              <td className="border p-2 w-20">{p.platNumber}</td>
-              <td className="border p-2 w-32">{p.nama}</td>
-              <td className="border p-2 w-32">{p.team}</td>
-              {showPenalty && (
-                <td className="border p-2 w-24">
-                  <input
-                    type="number"
-                    className="w-full text-black p-1 rounded text-center"
-                    value={p.penaltyPoint ?? 0}
-                    onChange={(e) =>
-                      handlePenaltyChange(
-                        sesi === "Utama" ? "Utama" : "Sekunder",
-                        matchIndex,
-                        idx,
-                        e.target.value
-                      )
-                    }
-                  />
-                </td>
-              )}
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
-  );
+        <CardContent>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead className="w-16 text-center">Gate</TableHead>
+                <TableHead className="w-20 text-center">Finish</TableHead>
+                <TableHead className="w-20 text-center">Plat</TableHead>
+                <TableHead className="w-32">Nama Rider</TableHead>
+                <TableHead className="w-32">Team</TableHead>
+                {showPenalty && <TableHead className="w-24 text-center">Penalty</TableHead>}
+              </TableRow>
+            </TableHeader>
+
+            <TableBody>
+              {match.map((p, idx) => (
+                <TableRow key={idx}>
+                  <TableCell className="text-center">{idx + 1}</TableCell>
+                  <TableCell>
+                    <Input
+                      type="number"
+                      size="sm"
+                      className="text-center"
+                      value={p.finish ?? ""}
+                      onChange={(e) =>
+                        handleFinishChange(
+                          sesi === "Utama" ? "Utama" : "Sekunder",
+                          matchIndex,
+                          idx,
+                          e.target.value
+                        )
+                      }
+                    />
+                  </TableCell>
+                  <TableCell className="text-center">{p.platNumber}</TableCell>
+                  <TableCell>{p.nama}</TableCell>
+                  <TableCell>{p.team}</TableCell>
+                  {showPenalty && (
+                    <TableCell>
+                      <Input
+                        type="number"
+                        size="sm"
+                        className="text-center"
+                        value={p.penaltyPoint ?? 0}
+                        onChange={(e) =>
+                          handlePenaltyChange(
+                            sesi === "Utama" ? "Utama" : "Sekunder",
+                            matchIndex,
+                            idx,
+                            e.target.value
+                          )
+                        }
+                      />
+                    </TableCell>
+                  )}
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </CardContent>
+      </Card>
+    );
 
   return (
     <div className="p-6 space-y-6">
-      <h1 className="text-2xl font-bold text-white">Pertandingan Lanjutan </h1>
+      <h1 className="text-2xl font-bold text-textlight">Pertandingan Lanjutan</h1>
 
       <div className="flex justify-end mb-4">
-        <button
+        <Button
+          variant="primary"
           onClick={() => setShowPenalty(!showPenalty)}
-          className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg shadow-lg"
         >
           {showPenalty ? "Sembunyikan Penalty Point" : "Tampilkan Penalty Point"}
-        </button>
+        </Button>
       </div>
 
       {matchesUtama.map((match, idx) => renderMatchTable(match, idx, "Utama"))}
       {matchesSekunder.map((match, idx) => renderMatchTable(match, idx, "Sekunder"))}
 
-      <div className="flex justify-center mt-6 space-x-4">
-        <button
+      <div className="flex justify-center gap-4 mt-6 flex-wrap">
+        <Button
+          variant="secondary"
           onClick={handleSaveFinish}
-          className="bg-yellow-600 hover:bg-yellow-700 text-white font-semibold py-2 px-4 rounded-lg shadow-lg"
+          className="bg-yellow-600 hover:bg-yellow-700 text-white"
         >
           Simpan Finish
-        </button>
+        </Button>
 
-        <button
+        <Button
+          variant="secondary"
           onClick={() => navigate(`/admindashboard/olahdatapeserta/${lombaId}`)}
-          className="bg-gray-600 hover:bg-gray-700 text-white font-semibold py-2 px-4 rounded-lg shadow-lg"
         >
           Kembali
-        </button>
+        </Button>
 
-        <button
+        <Button
+          variant="primary"
           onClick={() => navigate(`/final/${lombaId}`)}
-          className="bg-purple-600 hover:bg-purple-700 text-white font-semibold py-2 px-4 rounded-lg shadow-lg"
+          className="bg-purple-600 hover:bg-purple-700"
         >
           Lanjutkan Sesi Lomba
-        </button>
+        </Button>
       </div>
     </div>
   );

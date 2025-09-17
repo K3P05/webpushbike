@@ -2,6 +2,18 @@ import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import api from "@/services/api";
 
+// UI Components
+import { Card, CardHeader, CardTitle, CardContent } from "@/component/ui/Card";
+import Button from "@/component/ui/Buttons";
+import {
+  Table,
+  TableHeader,
+  TableRow,
+  TableHead,
+  TableBody,
+  TableCell,
+} from "@/component/ui/Table";
+
 type Peserta = {
   id_pendaftaran: number;
   nama: string;
@@ -30,7 +42,7 @@ export default function PesertaLombaCek() {
       const data: Peserta[] = res.data || [];
       setPesertaList(data);
 
-      // Sync selected sesuai statusPembayaran dari DB
+      // sync checkbox sesuai DB
       const initialSelected: Record<number, boolean> = {};
       data.forEach((p) => {
         initialSelected[p.id_pendaftaran] = p.statusPembayaran;
@@ -76,105 +88,118 @@ export default function PesertaLombaCek() {
   };
 
   const handleSave = async () => {
-  const confirmSave = window.confirm(
-    "Apakah Anda yakin ingin menyimpan perubahan status pembayaran?"
-  );
-  if (!confirmSave) return;
+    const confirmSave = window.confirm(
+      "Apakah Anda yakin ingin menyimpan perubahan status pembayaran?"
+    );
+    if (!confirmSave) return;
 
-  try {
-    // Ambil semua peserta dan kirim status terbaru sesuai checkbox
-    for (const peserta of pesertaList) {
-      const checked = selected[peserta.id_pendaftaran] ?? peserta.statusPembayaran;
-      await api.patch(`/lomba/${id}/peserta/${peserta.id_pendaftaran}/status`, {
-        statusPembayaran: checked,
-      });
+    try {
+      for (const peserta of pesertaList) {
+        const checked =
+          selected[peserta.id_pendaftaran] ?? peserta.statusPembayaran;
+        await api.patch(
+          `/lomba/${id}/peserta/${peserta.id_pendaftaran}/status`,
+          {
+            statusPembayaran: checked,
+          }
+        );
+      }
+
+      alert("Status pembayaran berhasil diperbarui ✅");
+      fetchPeserta();
+    } catch (err) {
+      console.error("Gagal simpan status:", err);
+      alert("Gagal menyimpan perubahan ❌");
     }
-
-    alert("Status pembayaran berhasil diperbarui ✅");
-    fetchPeserta();
-  } catch (err) {
-    console.error("Gagal simpan status:", err);
-    alert("Gagal menyimpan perubahan ❌");
-  }
-};
-
+  };
 
   return (
-    <div className="p-6 max-w-6xl mx-auto bg-[#222831] min-h-screen font-poppins">
-      <h1 className="text-2xl font-bold text-[#00ADB5] mb-6 text-center">
-        Peserta Lomba: {lombaNama}
-      </h1>
+    <div className="p-6 max-w-6xl mx-auto min-h-screen font-poppins">
+      <Card className="bg-base-card border border-border-accent/30 shadow-lg">
+        <CardHeader>
+          <CardTitle className="text-accent text-center text-2xl">
+            Peserta Lomba: {lombaNama}
+          </CardTitle>
+        </CardHeader>
 
-      <div className="flex justify-end mb-4">
-        {pesertaList.length > 0 && (
-          <button
-            onClick={toggleAll}
-            className="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded-lg"
-          >
-            Toggle Semua
-          </button>
-        )}
-      </div>
+        <CardContent>
+          <div className="flex justify-end mb-4">
+            {pesertaList.length > 0 && (
+              <Button
+                variant="secondary"
+                onClick={toggleAll}
+                className="bg-yellow-500 hover:bg-yellow-600 text-white"
+              >
+                Toggle Semua
+              </Button>
+            )}
+          </div>
 
-      <div className="overflow-x-auto">
-        {pesertaList.length === 0 ? (
-          <p className="text-center text-[#EEEEEE] py-6">Belum ada peserta</p>
-        ) : (
-          <table className="min-w-full border border-[#EEEEEE]/20 text-[#EEEEEE] text-sm rounded-lg">
-            <thead className="bg-[#00ADB5] text-[#222831]">
-              <tr>
-                <th className="px-2 py-2 text-left">No</th>
-                <th className="px-2 py-2 text-left">Nama</th>
-                <th className="px-2 py-2 text-left">Plat</th>
-                <th className="px-2 py-2 text-left">Community</th>
-                <th className="px-2 py-2 text-left">Kategori</th>
-                <th className="px-2 py-2 text-center">Status</th>
-              </tr>
-            </thead>
-            <tbody>
-              {pesertaList.map((p, index) => (
-                <tr
-                  key={p.id_pendaftaran}
-                  className="border-t border-[#EEEEEE]/20 hover:bg-[#00ADB5]/20"
-                >
-                  <td className="px-2 py-2">{index + 1}</td>
-                  <td className="px-2 py-2">{p.nama}</td>
-                  <td className="px-2 py-2">{p.platNumber}</td>
-                  <td className="px-2 py-2">{p.community}</td>
-                  <td className="px-2 py-2">{p.kategori}</td>
-                  <td className="px-2 py-2 text-center">
-                    <input
-                      type="checkbox"
-                      className="w-6 h-6 accent-[#00ADB5]"
-                      checked={selected[p.id_pendaftaran] ?? p.statusPembayaran}
-                      onChange={(e) =>
-                        toggleSelect(p.id_pendaftaran, e.target.checked)
-                      }
-                    />
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        )}
-      </div>
+          {pesertaList.length === 0 ? (
+            <p className="text-center text-text-light py-6">
+              Belum ada peserta
+            </p>
+          ) : (
+            <Table>
+              <TableHeader className="bg-accent text-base-dark">
+                <TableRow>
+                  <TableHead>No</TableHead>
+                  <TableHead>Nama</TableHead>
+                  <TableHead>Plat</TableHead>
+                  <TableHead>Community</TableHead>
+                  <TableHead>Kategori</TableHead>
+                  <TableHead className="text-center">Status</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {pesertaList.map((p, index) => (
+                  <TableRow
+                    key={p.id_pendaftaran}
+                    className="hover:bg-accent/20 transition"
+                  >
+                    <TableCell>{index + 1}</TableCell>
+                    <TableCell>{p.nama}</TableCell>
+                    <TableCell>{p.platNumber}</TableCell>
+                    <TableCell>{p.community}</TableCell>
+                    <TableCell>{p.kategori}</TableCell>
+                    <TableCell className="text-center">
+                      <input
+                        type="checkbox"
+                        className="w-6 h-6 accent-accent"
+                        checked={
+                          selected[p.id_pendaftaran] ?? p.statusPembayaran
+                        }
+                        onChange={(e) =>
+                          toggleSelect(p.id_pendaftaran, e.target.checked)
+                        }
+                      />
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          )}
 
-      <div className="mt-6 flex justify-between">
-        <button
-          onClick={() => navigate(-1)}
-          className="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg"
-        >
-          ← Kembali
-        </button>
-        {pesertaList.length > 0 && (
-          <button
-            onClick={handleSave}
-            className="bg-[#00ADB5] hover:bg-[#019ca4] text-white px-6 py-2 rounded-lg shadow"
-          >
-            Simpan
-          </button>
-        )}
-      </div>
+          <div className="mt-6 flex justify-between">
+            <Button
+              variant="secondary"
+              onClick={() => navigate(-1)}
+              className="bg-gray-500 hover:bg-gray-600 text-white"
+            >
+              ← Kembali
+            </Button>
+            {pesertaList.length > 0 && (
+              <Button
+                variant="success"
+                onClick={handleSave}
+                className="px-6 shadow"
+              >
+                Simpan
+              </Button>
+            )}
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 }

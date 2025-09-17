@@ -1,6 +1,20 @@
+// src/pages/Peserta/OlahDataPeserta.tsx
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import api from "@/services/api";
+
+// UI Components
+import Button from "@/component/ui/Buttons";
+import Input from "@/component/ui/Input";
+import {
+  Table,
+  TableHeader,
+  TableBody,
+  TableRow,
+  TableHead,
+  TableCell,
+} from "@/component/ui/Table";
+import { Card, CardHeader, CardTitle, CardContent } from "@/component/ui/Card";
 
 interface Peserta {
   id_pendaftaran: number;
@@ -42,12 +56,9 @@ export default function OlahDataPeserta() {
     const fetchPeserta = async () => {
       try {
         if (!id) return;
-
-        // Ambil data lomba untuk jumlahBatch
         const lombaRes = await api.get<Lomba>(`/lomba/${id}`);
         setJumlahBatch(lombaRes.data.jumlahBatch || 1);
 
-        // Ambil peserta
         const res = await api.get<Peserta[]>(`/lomba/${id}/peserta`);
         const data: Peserta[] = (res.data ?? []).map((p: any) => ({
           id_pendaftaran: p.id_pendaftaran,
@@ -64,30 +75,30 @@ export default function OlahDataPeserta() {
 
         setPeserta(data);
 
-        // Hitung batch size
         const batchSize = Math.ceil(data.length / (lombaRes.data.jumlahBatch || 1));
-
-        // Siapkan batch kosong
-        const emptyBatches: Peserta[][] = Array.from({ length: lombaRes.data.jumlahBatch }, (_, idx) =>
-          Array.from({ length: batchSize }, () => ({
-            id_pendaftaran: 0,
-            nama: "",
-            kategori: "",
-            platNumber: "",
-            community: "",
-            id_lomba: Number(id),
-            batch: idx + 1,
-            point1: 0,
-            point2: 0,
-            totalPoint: 0,
-          }))
+        const emptyBatches: Peserta[][] = Array.from(
+          { length: lombaRes.data.jumlahBatch },
+          (_, idx) =>
+            Array.from({ length: batchSize }, () => ({
+              id_pendaftaran: 0,
+              nama: "",
+              kategori: "",
+              platNumber: "",
+              community: "",
+              id_lomba: Number(id),
+              batch: idx + 1,
+              point1: 0,
+              point2: 0,
+              totalPoint: 0,
+            }))
         );
 
-        // Masukkan peserta ke batch sesuai DB
         data.forEach((p) => {
           if (p.batch) {
             const batchIdx = p.batch - 1;
-            const emptySlot = emptyBatches[batchIdx].findIndex(slot => slot.id_pendaftaran === 0);
+            const emptySlot = emptyBatches[batchIdx].findIndex(
+              (slot) => slot.id_pendaftaran === 0
+            );
             if (emptySlot !== -1) {
               emptyBatches[batchIdx][emptySlot] = p;
             }
@@ -106,7 +117,6 @@ export default function OlahDataPeserta() {
     fetchPeserta();
   }, [id]);
 
-  // Generate gates untuk setiap batch
   const generateGates = (n: number) =>
     Array.from({ length: n }, (_, i) => {
       const gate1 = i + 1;
@@ -114,22 +124,18 @@ export default function OlahDataPeserta() {
       return { gate1, gate2 };
     });
 
-  // Ranking peserta
   const rankPeserta = (list: Peserta[]) => {
     const gates = generateGates(list.length);
-
     const withGate = list.map((p, i) => ({
       ...p,
       localId: i + 1,
       gate1: gates[i].gate1,
       gate2: gates[i].gate2 !== null ? Math.floor(gates[i].gate2) : null,
     }));
-
     const withTotal = withGate.map((p) => ({
       ...p,
       totalPoint: (p.point1 ?? 0) + (p.point2 ?? 0),
     }));
-
     const sorted = [...withTotal].sort((a, b) => a.totalPoint! - b.totalPoint!);
 
     return withTotal.map((p) => ({
@@ -142,7 +148,6 @@ export default function OlahDataPeserta() {
     setBatchPeserta((prev) => {
       const updated = [...prev];
       const batch = [...updated[batchIdx]];
-
       const found = peserta.find((ps) => ps.platNumber === value);
 
       batch[localIdx] = {
@@ -164,10 +169,9 @@ export default function OlahDataPeserta() {
   const handleSimpan = async () => {
     try {
       for (let i = 0; i < batchPeserta.length; i++) {
-        // Ambil hanya id peserta valid
         const pesertaIds = batchPeserta[i]
-          .filter(p => p.id_pendaftaran !== 0)
-          .map(p => p.id_pendaftaran);
+          .filter((p) => p.id_pendaftaran !== 0)
+          .map((p) => p.id_pendaftaran);
 
         if (pesertaIds.length > 0) {
           await api.post(`/lomba/${id}/peserta/batch`, {
@@ -183,85 +187,76 @@ export default function OlahDataPeserta() {
     }
   };
 
-  if (loading) return <p className="text-white">Loading...</p>;
+  if (loading) return <p className="text-text-light">Loading...</p>;
   if (error) return <p className="text-red-400">{error}</p>;
 
   return (
-    <div className="p-6 space-y-8">
-      <h1 className="text-2xl font-bold text-white">Olah Data Pertandingan</h1>
+    <div className="p-6 space-y-8 font-poppins">
+      <h1 className="text-2xl font-bold text-text-light">Olah Data Pertandingan</h1>
 
       {batchPeserta.map((batch, i) => {
         const batchRanked = rankPeserta(batch);
         return (
-          <div key={i} className="bg-gray-800 p-4 rounded-lg">
-            <h2 className="text-xl font-semibold text-cyan-400">Batch {i + 1}</h2>
-            <table className="w-full border-collapse border border-gray-500 mt-2 text-center text-white">
-              <thead>
-                <tr>
-                  <th className="border p-1 w-16">Gate 1</th>
-                  <th className="border p-1 w-16">Gate 2</th>
-                  <th className="border p-1 w-20">Plat</th>
-                  <th className="border p-1 w-32">Nama</th>
-                  <th className="border p-1 w-32">Community</th>
-                  <th className="border p-1 w-16">Point1</th>
-                  <th className="border p-1 w-16">Point2</th>
-                  <th className="border p-1 w-20">Total</th>
-                  <th className="border p-1 w-16">Rank</th>
-                </tr>
-              </thead>
-              <tbody>
-                {batchRanked.map((p, idx) => (
-                  <tr key={idx}>
-                    <td className="border p-1">{p.gate1}</td>
-                    <td className="border p-1">{p.gate2}</td>
-                    <td className="border p-1">
-                      <input
-                        type="text"
-                        value={p.platNumber}
-                        onChange={(e) => handlePlatChange(i, idx, e.target.value)}
-                        className="bg-gray-700 text-white p-1 rounded w-full text-center"
-                      />
-                    </td>
-                    <td className="border p-1">{p.nama}</td>
-                    <td className="border p-1">{p.community}</td>
-                    <td className="border p-1">{p.point1}</td>
-                    <td className="border p-1">{p.point2}</td>
-                    <td className="border p-1">{p.totalPoint}</td>
-                    <td className="border p-1">{p.rank}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-
-          </div>
+          <Card key={i}>
+            <CardHeader>
+              <CardTitle>Batch {i + 1}</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Gate 1</TableHead>
+                    <TableHead>Gate 2</TableHead>
+                    <TableHead>Plat</TableHead>
+                    <TableHead>Nama</TableHead>
+                    <TableHead>Community</TableHead>
+                    <TableHead>Point1</TableHead>
+                    <TableHead>Point2</TableHead>
+                    <TableHead>Total</TableHead>
+                    <TableHead>Rank</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {batchRanked.map((p, idx) => (
+                    <TableRow key={idx}>
+                      <TableCell>{p.gate1}</TableCell>
+                      <TableCell>{p.gate2}</TableCell>
+                      <TableCell>
+                        <Input
+                          value={p.platNumber}
+                          onChange={(e) => handlePlatChange(i, idx, e.target.value)}
+                          size="sm"
+                          className="text-center"
+                        />
+                      </TableCell>
+                      <TableCell>{p.nama}</TableCell>
+                      <TableCell>{p.community}</TableCell>
+                      <TableCell>{p.point1}</TableCell>
+                      <TableCell>{p.point2}</TableCell>
+                      <TableCell>{p.totalPoint}</TableCell>
+                      <TableCell>{p.rank}</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </CardContent>
+          </Card>
         );
       })}
 
       <div className="flex justify-center mt-6 space-x-4">
-        <button
-          onClick={handleSimpan}
-          className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg shadow-lg"
-        >
+        <Button onClick={handleSimpan} variant="primary">
           Simpan Data Batch
-        </button>
-        <button
-          onClick={() => navigate(`/inputhasillomba/moto1/${id}`)}
-          className="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded-lg shadow-lg"
-        >
+        </Button>
+        <Button onClick={() => navigate(`/inputhasillomba/moto1/${id}`)} variant="success">
           Input Hasil Lomba Moto 1
-        </button>
-        <button
-          onClick={() => navigate(`/inputhasillomba/moto2/${id}`)}
-          className="bg-purple-600 hover:bg-purple-700 text-white font-semibold py-2 px-4 rounded-lg shadow-lg"
-        >
+        </Button>
+        <Button onClick={() => navigate(`/inputhasillomba/moto2/${id}`)} variant="secondary">
           Input Hasil Lomba Moto 2
-        </button>
-        <button
-          onClick={() => navigate(`/sesilanjutanlomba/${id}`)}
-          className="bg-red-600 hover:bg-red-700 text-white font-semibold py-2 px-4 rounded-lg shadow-lg"
-        >
+        </Button>
+        <Button onClick={() => navigate(`/sesilanjutanlomba/${id}`)} variant="warning">
           Lanjutkan Sesi Lomba
-        </button>
+        </Button>
       </div>
     </div>
   );

@@ -1,6 +1,9 @@
 // src/pages/LoginAdmin.tsx
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { Card, CardContent, CardHeader, CardTitle } from "@/component/ui/Card";
+import Input from "@/component/ui/Input";
+import Button from "@/component/ui/Buttons";
 
 export default function LoginAdmin() {
   const [formData, setFormData] = useState({ username: "", password: "" });
@@ -13,48 +16,51 @@ export default function LoginAdmin() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Hardcode login dulu
     if (formData.username === "admin" && formData.password === "12345") {
       alert("Login berhasil!");
-      navigate("/admindashboard"); // redirect ke dashboard
+      navigate("/admindashboard");
     } else {
       alert("Username atau password salah!");
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-[#222831] font-[Poppins]">
-      <div className="bg-[#393E46] shadow-lg rounded-xl p-8 w-full max-w-md">
-        <h1 className="text-2xl font-bold text-center mb-6 text-[#EEEEEE]">
-          Login Admin
-        </h1>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <input
-            type="text"
-            name="username"
-            placeholder="Username"
-            value={formData.username}
-            onChange={handleChange}
-            className="w-full p-3 rounded-lg bg-[#222831] text-[#EEEEEE] placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#00ADB5]"
-            required
-          />
-          <input
-            type="password"
-            name="password"
-            placeholder="Password"
-            value={formData.password}
-            onChange={handleChange}
-            className="w-full p-3 rounded-lg bg-[#222831] text-[#EEEEEE] placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#00ADB5]"
-            required
-          />
-          <button
-            type="submit"
-            className="w-full bg-[#00ADB5] hover:bg-[#019ca3] text-[#EEEEEE] py-3 rounded-lg transition"
-          >
-            Login
-          </button>
-        </form>
-      </div>
+    <div className="min-h-screen flex items-center justify-center font-poppins">
+      <Card className="w-full max-w-md bg-base-card text-text-light shadow-xl rounded-2xl animate-scale-in">
+        <CardHeader>
+          <CardTitle className="text-center text-2xl font-bold text-accent">
+            Login Admin
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <Input
+              type="text"
+              name="username"
+              placeholder="Username"
+              value={formData.username}
+              onChange={handleChange}
+              className="bg-base-dark border border-border-accent text-text-light placeholder-text-placeholder focus-visible:ring-accent-ring"
+              required
+            />
+            <Input
+              type="password"
+              name="password"
+              placeholder="Password"
+              value={formData.password}
+              onChange={handleChange}
+              className="bg-base-dark border border-border-accent text-text-light placeholder-text-placeholder focus-visible:ring-accent-ring"
+              required
+            />
+            <Button
+              type="submit"
+              className="w-full bg-accent hover:bg-accent-hover text-text-light rounded-lg py-2"
+            >
+              Login
+            </Button>
+          </form>
+        </CardContent>
+      </Card>
     </div>
   );
 }

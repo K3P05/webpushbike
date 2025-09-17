@@ -18,6 +18,8 @@ interface PesertaSesi {
   finishSesi1?: number | null;
   finish?: number | null;
   penaltyPoint?: number;
+  kategoriSesi2?: string | null;
+  matchIndexSesi2?: number | null;
 }
 
 export default function Final() {
@@ -31,10 +33,8 @@ export default function Final() {
   const [showPenalty, setShowPenalty] = useState(false);
   const [showHasil, setShowHasil] = useState(false);
 
-  // --- state untuk nama match ---
   const [matchNames, setMatchNames] = useState<Record<string, string>>({});
 
-  // --- handler update nama match ---
   const handleMatchNameChange = async (
     sesi: "Utama" | "Sekunder",
     matchIndex: number,
@@ -54,7 +54,7 @@ export default function Final() {
         pesertaList.map((p) =>
           api.post(`/lomba/${lombaId}/peserta/match/name`, {
             pesertaId: p.id_pendaftaran,
-            sesi: 2, // khusus sesi 2
+            sesi: 2,
             matchName: value,
           })
         )
@@ -70,7 +70,6 @@ export default function Final() {
       try {
         if (!lombaId) return;
 
-        // === logika asli Anda (tidak diubah) ===
         const resPeserta = await api.get<any[]>(`/lomba/${lombaId}/peserta`);
         const pesertaData: PesertaSesi[] = resPeserta.data.map((p: any) => {
           const sesi1 = p.pointSesi?.find((s: any) => s.sesi === 1);
@@ -90,7 +89,7 @@ export default function Final() {
             gateMoto1: p.gateMoto1 ?? 0,
             gateMoto2: p.gateMoto2 ?? 0,
             matchName: sesi2?.matchName ?? null,
-           kategoriSesi2: sesi2?.kategori ?? null, // "Utama" / "Sekunder"
+            kategoriSesi2: sesi2?.kategori ?? null,
             matchIndexSesi2: sesi2?.matchIndex ?? null,
           };
         });
@@ -176,10 +175,7 @@ export default function Final() {
         setMatchesUtama(allocateByStructure(utama2Pool, matchesSesi1Utama));
         setMatchesSekunder(allocateByStructure(sekunder2Pool, matchesSesi1Sekunder));
 
-        // --- inisialisasi matchNames sesuai data dari DB ---
-        // --- inisialisasi matchNames sesuai data dari matchesUtama dan matchesSekunder yang sudah di-allocate ---
         const initialMatchNames: Record<string, string> = {};
-
         allocateByStructure(utama2Pool, matchesSesi1Utama).forEach((match, mi) => {
           const first = match.find((p) => p.matchName);
           if (first?.matchName) initialMatchNames[`Utama-${mi}`] = first.matchName;
@@ -191,9 +187,6 @@ export default function Final() {
         });
 
         setMatchNames(initialMatchNames);
-
-
-        
       } catch (err) {
         console.error(err);
       } finally {
@@ -204,9 +197,8 @@ export default function Final() {
     fetchData();
   }, [lombaId]);
 
-  if (loading) return <p className="text-white">Loading...</p>;
+  if (loading) return <p className="text-text-light">Loading...</p>;
 
-  // === logika finish & penalty (tetap) ===
   const handleFinishChange = (
     matchType: "Utama" | "Sekunder",
     matchIndex: number,
@@ -262,17 +254,13 @@ export default function Final() {
     }
   };
 
-  // === render tabel dengan tambahan input matchName ===
   const renderMatchTable = (
     match: PesertaSesi[],
     matchIndex: number,
     sesi: "Utama" | "Sekunder"
   ) => (
-    <div key={`${sesi}-${matchIndex}`} className="bg-gray-800 p-4 rounded-lg mb-6">
+    <div key={`${sesi}-${matchIndex}`} className="bg-base-card p-4 rounded-xl mb-6 shadow-md">
       <div className="flex items-center space-x-4 mb-2">
-        <h2 className="text-xl font-semibold text-cyan-400 hidden">
-          {sesi} - Match {matchIndex + 1}
-        </h2>
         <input
           type="text"
           placeholder="Nama Match..."
@@ -288,7 +276,7 @@ export default function Final() {
         />
       </div>
 
-      <table className="w-full border-collapse border border-gray-500 mt-2 text-white text-center">
+      <table className="w-full border-collapse border border-accent mt-2 text-text-light text-center">
         <thead>
           <tr>
             <th className="border p-1 w-16">Gate Start</th>
@@ -335,10 +323,9 @@ export default function Final() {
     </div>
   );
 
-  // === render hasil tetap ===
   const renderHasilTable = (matches: PesertaSesi[][], title: string) => (
     <div className="mb-6">
-      <h2 className="text-xl font-semibold text-white mb-4">{title}</h2>
+      <h2 className="text-xl font-semibold text-text-light mb-4">{title}</h2>
       {matches.map((match, matchIndex) => {
         const sortedMatch = match
           .filter((p) => p.finish !== null && p.finish !== undefined)
@@ -349,12 +336,12 @@ export default function Final() {
         return (
           <div
             key={`${title}-match-${matchIndex}`}
-            className="bg-gray-800 p-4 rounded-lg mb-6"
+            className="bg-base-card p-4 rounded-xl mb-6 shadow-md"
           >
-            <h3 className="text-lg font-semibold text-cyan-400">
+            <h3 className="text-lg font-semibold text-accent">
               {match[0]?.matchName ?? "Nama match belum diupdate"}
             </h3>
-            <table className="w-full border-collapse border border-gray-500 mt-2 text-white">
+            <table className="w-full border-collapse border border-accent mt-2 text-text-light">
               <thead>
                 <tr>
                   <th className="border p-2">Gate Start</th>
@@ -382,12 +369,9 @@ export default function Final() {
     </div>
   );
 
-
   return (
-    <div className="p-6 space-y-6">
-      <h1 className="text-2xl font-bold text-white">
-        Pertandingan Lanjutan
-      </h1>
+    <div className="p-6 space-y-6 min-h-screen">
+      <h1 className="text-2xl font-bold text-text-light">Pertandingan Lanjutan</h1>
 
       <div className="flex space-x-4">
         <button
